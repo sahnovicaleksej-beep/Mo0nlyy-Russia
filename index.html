@@ -1,0 +1,2563 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#07090e">
+<meta name="screen-orientation" content="landscape">
+<title>Mo0nlyy Russia</title>
+<style>
+:root{
+  --bg:#07090e;--panel:#10141c;--panel2:#161c27;--line:#242c3a;
+  --text:#e7e4dc;--dim:#8b93a1;--red:#c83a4a;--red2:#9b2233;
+  --gold:#c9a56a;--ok:#3cbe7a;--money:#b6e3b0;--shadow:0 18px 50px #000a;
+  --safe-l:env(safe-area-inset-left,0px);--safe-r:env(safe-area-inset-right,0px);
+  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font:13px/1.45 "Segoe UI",Roboto,Arial,sans-serif;overflow:hidden;user-select:none;touch-action:none}
+button,input,select{font:inherit;color:inherit}
+#tilt{display:none;position:fixed;inset:0;z-index:80;background:#07090e;align-items:center;justify-content:center;flex-direction:column;gap:10px;text-align:center;padding:24px}
+#tilt b{font-size:22px;letter-spacing:.08em}
+#boot,#home,#stage,#authScreen{position:fixed;inset:0}
+#boot{z-index:40;background:#05070b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.crescent{width:64px;height:64px;border-radius:50%;box-shadow:14px -8px 0 0 #e8e2d4;transform:rotate(-20deg);margin-bottom:6px}
+.boot-name{font-size:28px;letter-spacing:.28em;font-weight:700}
+.boot-name span{color:var(--gold)}
+.boot-sub{color:var(--dim);letter-spacing:.32em;font-size:10px}
+.bar{width:min(420px,70vw);height:4px;background:#1a2130;border-radius:4px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold));transition:width .25s}
+.blog{width:min(420px,70vw);height:78px;color:#6a7382;font:11px/1.6 ui-monospace,Consolas,monospace;overflow:hidden}
+
+#authScreen{z-index:35;display:none;align-items:center;justify-content:center;background:radial-gradient(800px 600px at 30% 20%,#c83a4a22,transparent),radial-gradient(900px 500px at 80% 80%,#c9a56a22,transparent),linear-gradient(180deg,#0a0d14,#05070b)}
+#authScreen.on{display:flex}
+.auth-card{width:min(440px,92vw);max-height:92vh;overflow:auto;background:#10141cee;border:1px solid var(--line);border-radius:14px;box-shadow:0 30px 80px #000c,0 0 0 1px #ffffff08 inset;padding:28px 26px;backdrop-filter:blur(10px)}
+.auth-logo{text-align:center;margin-bottom:22px}
+.auth-logo .crescent{display:inline-block;margin-bottom:8px}
+.auth-logo .boot-name{font-size:26px;letter-spacing:.32em}
+.auth-tabs{display:flex;background:#0a0d14;border-radius:10px;padding:4px;margin-bottom:20px;border:1px solid var(--line)}
+.auth-tab{flex:1;background:transparent;border:0;padding:10px 0;color:var(--dim);letter-spacing:.14em;font-size:12px;font-weight:600;cursor:pointer;border-radius:8px;transition:.2s}
+.auth-tab.active{background:linear-gradient(180deg,#1a2130,#141a26);color:var(--text);box-shadow:0 2px 8px #0006}
+.auth-group{display:flex;flex-direction:column;gap:14px}
+.auth-group label{display:flex;flex-direction:column;gap:6px;color:var(--dim);font-size:10px;letter-spacing:.14em;font-weight:600}
+.auth-group input{background:#0a0d14;border:1px solid var(--line);color:var(--text);padding:12px 14px;border-radius:8px;outline:none;font-size:14px;transition:.15s}
+.auth-group input:focus{border-color:var(--gold);box-shadow:0 0 0 3px #c9a56a22}
+.auth-error{min-height:18px;color:#ff6070;font-size:12px;text-align:center}
+.auth-btn{width:100%;background:linear-gradient(180deg,#d2505e,#9b2233);border:0;color:#fff;letter-spacing:.2em;font-weight:700;padding:14px;cursor:pointer;border-radius:10px;font-size:13px;box-shadow:0 8px 24px #c83a4a33;transition:.15s}
+.auth-btn:hover{transform:translateY(-1px)}
+.auth-btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+.auth-note{color:#5b6370;font-size:11px;text-align:center;line-height:1.5;margin:0}
+
+/* ============ ЭКРАН ВЫБОРА СЕРВЕРА ============ */
+#serverScreen{
+  position:fixed;inset:0;z-index:45;
+  background:radial-gradient(1000px 600px at 20% 0%,#c83a4a18,transparent),radial-gradient(900px 500px at 90% 100%,#6aa7d818,transparent),linear-gradient(180deg,#0a0d14,#05070b);
+  display:none;align-items:center;justify-content:center;padding:20px;overflow:auto;
+}
+#serverScreen.on{display:flex}
+.srv-screen-wrap{width:100%;max-width:520px;display:flex;flex-direction:column;gap:14px;padding-top:calc(8px + var(--safe-t));padding-bottom:calc(8px + var(--safe-b))}
+.srv-screen-title{font-size:22px;font-weight:700;letter-spacing:.12em;text-align:center;color:var(--text)}
+.srv-screen-sub{font-size:12px;text-align:center;color:var(--dim);margin-bottom:8px;line-height:1.5}
+.srv-screen-list{display:flex;flex-direction:column;gap:12px}
+.srv-big{
+  padding:18px 20px;border-radius:14px;
+  background:linear-gradient(180deg,#141a26,#0e131c);
+  border:2px solid var(--line);cursor:pointer;
+  transition:.15s;position:relative;overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+.srv-big:active{transform:scale(0.98)}
+.srv-big.crimson{border-left:5px solid #c83a4a}
+.srv-big.prime{border-left:5px solid #6aa7d8}
+.srv-big-name{font-size:18px;font-weight:700;letter-spacing:.06em;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.srv-big-name.crimson{color:#ff8090}
+.srv-big-name.prime{color:#8acaff}
+.srv-big-desc{font-size:12px;color:var(--dim);margin-bottom:10px;line-height:1.5}
+.srv-big-meta{display:flex;gap:6px;flex-wrap:wrap}
+.srv-big-badge{font-size:10px;padding:3px 9px;border-radius:20px;border:1px solid var(--line);color:var(--dim)}
+.srv-big-badge.online{color:var(--ok);border-color:#3cbe7a55;background:#3cbe7a15}
+.srv-big-badge.region{color:#cfe4ff;border-color:#4a6a8a55;background:#4a6a8a15}
+.srv-big-badge.ping{color:var(--money);border-color:#b6e3b055;background:#b6e3b015}
+.srv-screen-cancel{background:transparent;border:1px solid var(--line);color:var(--dim);padding:12px;border-radius:10px;cursor:pointer;font-size:13px;letter-spacing:.1em;margin-top:4px}
+.srv-screen-cancel:active{background:#ffffff08}
+
+/* ============ ЛАУНЧЕР ============ */
+#home{z-index:20;display:none;grid-template-columns:320px 1fr 280px;grid-template-rows:72px 1fr 130px;background:radial-gradient(1000px 600px at 20% 0%,#c83a4a18,transparent),radial-gradient(900px 500px at 90% 100%,#c9a56a18,transparent),linear-gradient(180deg,#0c1018,#07090e)}
+#home.on{display:grid}
+.top{grid-column:1/-1;display:flex;align-items:center;gap:16px;padding:0 24px 0 calc(20px + var(--safe-l));border-bottom:1px solid var(--line);background:#0c1018cc;backdrop-filter:blur(10px)}
+.brand{display:flex;align-items:center;gap:12px;letter-spacing:.18em;font-weight:700}
+.brand i{width:32px;height:32px;border-radius:50%;box-shadow:8px -5px 0 0 #e8e2d4;display:block;transform:rotate(-20deg)}
+.brand small{display:block;color:var(--dim);letter-spacing:.28em;font-size:9px;font-weight:500}
+.top nav{margin-left:auto;display:flex;gap:6px}
+.top nav button{background:transparent;border:1px solid transparent;color:var(--dim);padding:9px 14px;cursor:pointer;border-radius:8px;letter-spacing:.05em}
+.top nav button.active,.top nav button:hover{color:var(--text);border-color:var(--line);background:#ffffff08}
+.ver{color:#5b6370;font-size:11px;margin-left:8px}
+.side,.hero,.cast{border-right:1px solid var(--line);overflow:auto;padding:20px}
+.hero{border-right:none;padding:0;display:flex;flex-direction:column;min-width:0}
+.cast{border-left:1px solid var(--line);padding:20px}
+h3{font-size:11px;letter-spacing:.18em;color:var(--dim);font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.news{display:flex;flex-direction:column;gap:8px}
+.news article{background:linear-gradient(180deg,#131924,#0e131c);border:1px solid var(--line);padding:12px 14px;border-radius:10px}
+.news time{color:var(--gold);font-size:10px;letter-spacing:.08em;display:block;margin-bottom:4px}
+.hero-hint{padding:14px 22px;background:linear-gradient(180deg,#10141c,#0c1018);border-bottom:1px solid var(--line);font-size:12px;color:var(--dim)}
+.hero-hint b{color:var(--gold)}
+
+.current-server{margin:20px 22px;padding:22px;border-radius:14px;background:linear-gradient(180deg,#141a26,#0e131c);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}
+.cs-label{font-size:10px;letter-spacing:.2em;color:var(--dim)}
+.cs-name{font-size:22px;font-weight:700;color:var(--gold);letter-spacing:.08em}
+.cs-desc{font-size:12px;color:var(--dim);line-height:1.5;max-width:420px}
+.cs-btn{margin-top:6px;background:linear-gradient(180deg,#1a2130,#141a26);border:1px solid var(--gold);color:var(--gold);padding:11px 22px;border-radius:10px;cursor:pointer;font-size:12px;letter-spacing:.1em;font-weight:600;transition:.15s}
+.cs-btn:hover{background:#1a1d27;box-shadow:0 8px 20px #c9a56a22}
+.cs-btn:active{transform:scale(0.97)}
+
+.foot{grid-column:1/-1;display:flex;flex-direction:column;gap:10px;padding:14px 22px;padding-left:calc(22px + var(--safe-l));padding-right:calc(22px + var(--safe-r));border-top:1px solid var(--line);background:linear-gradient(180deg,#0c1018,#0a0d14)}
+.foot-row{display:flex;align-items:center;gap:14px;width:100%}
+label.field{display:flex;flex-direction:column;gap:5px;color:var(--dim);font-size:10px;letter-spacing:.14em;font-weight:600}
+label.field input{background:#0a0d14;border:1px solid var(--line);padding:11px 13px;width:240px;outline:none;border-radius:8px;font-size:14px}
+label.field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px #c9a56a22}
+.play{margin-left:auto;background:linear-gradient(180deg,#d2505e,#9b2233);border:0;color:#fff;letter-spacing:.22em;font-weight:700;padding:16px 32px;cursor:pointer;min-width:230px;box-shadow:0 10px 28px #c83a4a44;border-radius:10px;font-size:13px}
+.play:disabled{opacity:.35;cursor:default;box-shadow:none}
+.hint{color:#5b6370;font-size:11px}
+.help-line{color:#8b93a1;font-size:11px;text-align:center}
+.help-line b{color:var(--gold)}
+.skins{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:10px}
+.skins canvas{background:#0a0d14;border:1px solid var(--line);border-radius:10px}
+.skins button{width:36px;height:36px;background:linear-gradient(180deg,#1a2130,#141a26);border:1px solid var(--line);cursor:pointer;border-radius:10px;color:var(--gold);font-size:14px}
+#motd{margin-top:12px;text-align:center;padding:10px;background:#0a0d14;border:1px solid var(--line);border-radius:10px;font-size:11px;line-height:1.5}
+
+.modal{position:fixed;inset:0;z-index:50;background:#000a;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal.on{display:flex}
+.sheet{width:min(520px,92vw);max-height:85vh;overflow:auto;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);padding:22px;border-radius:14px}
+.sheet h2{font-size:16px;margin-bottom:10px}
+.sheet p{color:var(--dim);margin-bottom:8px}
+.sheet ul{color:var(--dim);margin:8px 0 8px 18px;font-size:12px}
+.sheet li{margin-bottom:5px}
+.sheet button{margin-top:12px;background:var(--red2);border:0;padding:10px 18px;cursor:pointer;border-radius:8px;color:#fff;font-weight:600}
+.sheet h3{font-size:12px;letter-spacing:.12em;color:var(--gold);margin-top:16px;margin-bottom:6px}
+.email-sheet{width:min(540px,92vw)}
+.email-header{display:flex;gap:14px;align-items:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.email-icon{font-size:38px;flex-shrink:0}
+.email-header h2{margin:0 0 4px 0;font-size:16px}
+.email-body{background:#0a0d14;border:1px solid var(--line);border-radius:10px;padding:18px;font-size:13px;line-height:1.6}
+.email-subject{font-size:14px;font-weight:700;color:var(--gold);margin-bottom:12px}
+.email-body p{margin-bottom:10px;color:#c8c4bc}
+.email-body ul{margin:8px 0 12px 18px;font-size:12px;color:#a8a49c}
+.email-body b{color:var(--text)}
+
+#stage{z-index:10;display:none;background:#000}
+#stage.on{display:block}
+#view{position:absolute;inset:0;width:100%;height:100%}
+
+/* ================= HUD ================= */
+#hud{pointer-events:none;position:absolute;inset:0;padding:calc(6px + var(--safe-t)) calc(8px + var(--safe-r)) calc(6px + var(--safe-b)) calc(8px + var(--safe-l))}
+
+.money{position:absolute;right:calc(10px + var(--safe-r));top:calc(8px + var(--safe-t));text-align:right;font:700 16px/1 "Segoe UI",Arial;color:var(--money);text-shadow:0 2px 0 #000,0 0 10px #000;z-index:5}
+.stars{position:absolute;right:calc(10px + var(--safe-r));top:calc(28px + var(--safe-t));color:#c83a4a;letter-spacing:2px;font-size:13px;text-shadow:0 2px 0 #000;z-index:5}
+.stats{position:absolute;right:calc(10px + var(--safe-r));top:calc(48px + var(--safe-t));width:100px;z-index:5}
+.stats b{display:block;height:5px;background:#1a2130;margin-top:3px;position:relative;border-radius:3px;overflow:hidden}
+.stats b i{position:absolute;inset:0 auto 0 0;background:#c83a4a}
+.stats b.a i{background:#6aa7d8}
+.stats b.h i{background:#c9a56a}
+
+#weather{position:absolute;left:calc(8px + var(--safe-l));top:calc(8px + var(--safe-t));background:#000a;border:1px solid #ffffff22;padding:3px 8px;font-size:10px;color:#cfe4ff;display:none;border-radius:6px;z-index:6}
+
+.help{position:absolute;left:50%;top:calc(8px + var(--safe-t));transform:translateX(-50%);background:#000a;border:1px solid #ffffff18;padding:5px 12px;font-size:11px;border-radius:8px;pointer-events:none;white-space:nowrap;max-width:36vw;overflow:hidden;text-overflow:ellipsis;z-index:6}
+
+.chat{position:absolute;left:calc(8px + var(--safe-l));bottom:calc(190px + var(--safe-b));width:min(260px,42vw);max-height:16vh;overflow:hidden;font:11px/1.35 "Segoe UI",Arial;text-shadow:0 1px 2px #000;color:#ddd;z-index:5}
+.chat div{padding:1px 0}
+
+#radar{position:absolute;left:calc(8px + var(--safe-l));bottom:calc(8px + var(--safe-b));width:88px;height:88px;border:2px solid #c9a56a55;background:#0a1a0acc;border-radius:6px;overflow:hidden;z-index:8}
+
+#stick{pointer-events:auto;position:absolute;left:calc(104px + var(--safe-l));bottom:calc(8px + var(--safe-b));width:100px;height:100px;border-radius:50%;background:#ffffff12;border:1px solid #ffffff22;z-index:8;touch-action:none}
+#knob{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:#ffffff28;border:1px solid #fff4}
+
+.acts{pointer-events:auto;position:absolute;right:calc(10px + var(--safe-r));bottom:calc(8px + var(--safe-b));display:flex;gap:8px;z-index:12}
+.dock{pointer-events:auto;position:absolute;right:calc(10px + var(--safe-r));bottom:calc(72px + var(--safe-b));display:flex;gap:6px;z-index:12}
+
+.acts button,.dock button{pointer-events:auto;width:52px;height:52px;border-radius:50%;border:1px solid #ffffff22;background:#0e141cdd;color:#fff;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:700;line-height:1;transition:transform .1s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.acts button:active,.dock button:active{transform:scale(0.94);background:#1d2430}
+.acts button small,.dock button small{display:block;font-size:7px;color:#9aa;letter-spacing:.02em;font-weight:400;margin-top:2px;line-height:1}
+
+#bRun{pointer-events:auto;position:fixed;left:calc(104px + var(--safe-l));bottom:calc(114px + var(--safe-b));width:56px;height:56px;border-radius:50%;background:#1a2a3aee;border:2px solid #3a5a7a;color:#8acaff;font-size:11px;display:none;z-index:13;touch-action:none;font-weight:700;-webkit-tap-highlight-color:transparent}
+#bRun.on{display:flex;align-items:center;justify-content:center}
+#bRun.active{background:#2a4a6a;border-color:#5a8aba}
+
+#bBrake{pointer-events:auto;position:fixed;right:calc(10px + var(--safe-r));bottom:calc(130px + var(--safe-b));width:56px;height:56px;border-radius:50%;background:#3a1a1aee;border:2px solid #7a2a2a;color:#ff8080;font-size:10px;display:none;z-index:13;touch-action:none;font-weight:700;-webkit-tap-highlight-color:transparent}
+#bBrake.on{display:flex;align-items:center;justify-content:center}
+#bBrake.active{background:#5a2a2a;border-color:#aa3a3a}
+
+.speed{position:absolute;right:calc(10px + var(--safe-r));bottom:calc(194px + var(--safe-b));text-align:right;font:700 20px/1 Arial;text-shadow:0 2px 0 #000;display:none;pointer-events:none;z-index:6}
+.speed small{display:block;font-size:9px;letter-spacing:.15em;color:var(--dim);font-weight:500;margin-top:2px}
+
+#cinput{pointer-events:auto;display:none;position:absolute;left:calc(8px + var(--safe-l));bottom:calc(120px + var(--safe-b));width:min(340px,58vw);background:#0e141cf0;border:1px solid var(--line);padding:8px 10px;outline:none;border-radius:8px;font-size:13px;z-index:20}
+
+.panel{pointer-events:auto;display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,92vw);max-height:82vh;overflow-y:auto;background:#10141ef2;border:1px solid var(--line);box-shadow:var(--shadow);padding:16px;border-radius:12px;z-index:30;backdrop-filter:blur(8px);-webkit-overflow-scrolling:touch}
+.panel.on{display:block}
+.panel h2{font-size:15px;margin-bottom:10px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #1a2130}
+.row button,.panel .go{background:#1b2430;border:1px solid var(--line);padding:6px 12px;cursor:pointer;border-radius:6px}
+.panel .go.red{background:var(--red2);border-color:transparent}
+
+.phone{
+  width:min(270px,92vw);
+  max-height:calc(100vh - 120px - var(--safe-t) - var(--safe-b));
+  overflow-y:auto;
+  background:#0b0f16f0;
+  border:1px solid var(--line);
+  padding:10px;
+  position:fixed;
+  right:calc(10px + var(--safe-r));
+  top:calc(56px + var(--safe-t));
+  display:none;
+  pointer-events:auto;
+  border-radius:12px;
+  box-shadow:0 20px 50px #000c;
+  backdrop-filter:blur(10px);
+  z-index:31;
+  -webkit-overflow-scrolling:touch;
+}
+.phone.on{display:block}
+.phone h4{letter-spacing:.16em;font-size:10px;color:var(--gold);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.phone button{display:block;width:100%;text-align:left;background:#151b26;border:1px solid var(--line);padding:9px 11px;margin-bottom:5px;cursor:pointer;border-radius:6px;font-size:12px}
+.phone button:active{background:#1d2430}
+
+.toast{position:absolute;left:50%;top:14%;transform:translateX(-50%);background:#000e;border:1px solid var(--gold);padding:8px 14px;display:none;z-index:40;text-align:center;border-radius:8px;font-size:12px;max-width:80vw;pointer-events:none}
+
+#eventBanner{max-width:80vw;font-size:12px;padding:8px 14px !important}
+
+#mgOverlay{position:fixed;inset:0;z-index:60;background:rgba(5,8,14,0.92);display:none;flex-direction:column;align-items:center;justify-content:center;user-select:none;padding:14px}
+#mgOverlay.on{display:flex}
+#mgTitle{font-size:18px;letter-spacing:.1em;color:var(--gold);margin-bottom:8px;text-transform:uppercase}
+#mgInfo{display:flex;gap:24px;margin-bottom:12px;font-size:14px}
+#mgInfo span{color:var(--dim)}
+#mgInfo b{color:var(--text);font-size:16px}
+#mgCanvas{border:2px solid var(--line);border-radius:8px;background:radial-gradient(circle at 50% 40%,#0e1420,#07090e);box-shadow:var(--shadow);touch-action:none;max-width:100%;height:auto}
+#mgExit{position:absolute;top:16px;right:16px;background:var(--red2);border:none;color:#fff;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px}
+#mgResult{display:none;flex-direction:column;align-items:center;gap:12px;margin-top:16px}
+#mgResult.on{display:flex}
+#mgResult h3{font-size:20px;color:var(--gold)}
+#mgResult p{color:var(--dim);font-size:14px;text-align:center}
+#mgResult button{background:var(--ok);border:none;color:#fff;padding:10px 28px;border-radius:6px;cursor:pointer;font-size:14px}
+
+.carCard{display:flex;flex-direction:column;gap:6px;padding:10px;background:var(--panel2);border:1px solid var(--line);margin-bottom:8px;border-radius:8px}
+.carCard .carTop{display:flex;justify-content:space-between;align-items:center}
+.carCard .carStats{font-size:11px;color:var(--dim);display:flex;gap:12px}
+.carCard .carPrice{font-size:15px;color:var(--money);font-weight:700}
+.carCard button{margin-top:4px}
+.propCard{display:flex;flex-direction:column;gap:4px;padding:10px;background:var(--panel2);border:1px solid var(--line);margin-bottom:8px;border-radius:8px}
+.propCard .propName{font-size:14px;font-weight:600}
+.propCard .propDesc{font-size:11px;color:var(--dim)}
+.propCard .propPrice{font-size:14px;color:var(--money);font-weight:700}
+.propOwned{border-color:var(--ok);background:#1a3a20}
+.famCreate{display:flex;flex-direction:column;gap:8px}
+.famCreate input{background:var(--panel2);border:1px solid var(--line);padding:10px;border-radius:8px;outline:none;color:var(--text)}
+.famCreate input:focus{border-color:var(--gold)}
+.famMember{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;margin-bottom:6px}
+.famMember .famRole{font-size:11px;color:var(--gold)}
+.famTag{display:inline-block;background:var(--gold);color:#07090e;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;margin-left:6px}
+
+.invItem{display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;margin-bottom:6px}
+.invItem .invName{font-size:13px}
+.invItem .invQty{color:var(--gold);font-weight:700;margin-left:6px}
+.invItem .invBtns{display:flex;gap:6px}
+.invItem button{padding:5px 10px;font-size:11px;border-radius:6px;cursor:pointer;border:1px solid var(--line);background:#1b2430}
+.invItem button.drop{background:#3a1a1a;border-color:#7a2a2a}
+
+#eventBanner.on{display:block;animation:eventIn .4s ease-out}
+@keyframes eventIn{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+.marketRow{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;margin-bottom:6px}
+.marketRow .mname{font-size:13px}
+.marketRow .mprice{font-size:14px;color:var(--money);font-weight:700}
+.marketRow .mdelta{font-size:11px;margin-left:8px}
+.marketRow .mdelta.up{color:var(--ok)}
+.marketRow .mdelta.down{color:var(--red)}
+
+.carOwnedCard{display:flex;gap:10px;padding:10px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;margin-bottom:8px;align-items:center}
+.carOwnedCard.active{border-color:var(--ok);background:#1a3a20}
+.carOwnedCard canvas{background:#0a0d14;border:1px solid var(--line);border-radius:6px;flex-shrink:0}
+.carOwnedCard .cinfo{flex:1;min-width:0}
+.carOwnedCard .cname{font-size:14px;font-weight:700;margin-bottom:4px}
+.carOwnedCard .cstats{font-size:11px;color:var(--dim);display:flex;gap:10px;flex-wrap:wrap}
+.carOwnedCard .cactions{display:flex;flex-direction:column;gap:4px}
+.carOwnedCard .cactions button{font-size:11px;padding:6px 10px;border-radius:6px;cursor:pointer;border:1px solid var(--line);background:#1b2430;white-space:nowrap}
+.carOwnedCard .cactions button.primary{background:var(--ok);border-color:transparent;color:#fff}
+.carOwnedCard .cactions button.danger{background:var(--red2);border-color:transparent;color:#fff}
+
+#houseOverlay{position:fixed;inset:0;z-index:55;background:#0a0d14;display:none;flex-direction:column}
+#houseOverlay.on{display:flex}
+#houseView{flex:1;position:relative;overflow:hidden;background:#0d1016}
+#houseInfo{position:absolute;left:16px;top:16px;background:#000a;border:1px solid var(--line);padding:12px 16px;border-radius:10px;pointer-events:none;z-index:2}
+#houseInfo h3{font-size:14px;margin-bottom:6px;color:var(--gold)}
+#houseExit{position:absolute;right:16px;top:16px;background:var(--red2);border:none;color:#fff;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:13px;z-index:2}
+
+#deathOverlay{position:fixed;inset:0;z-index:70;background:radial-gradient(circle at 50% 50%,#4a0000,#000);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#fff;text-align:center;padding:24px}
+#deathOverlay.on{display:flex}
+#deathOverlay h1{font-size:42px;letter-spacing:.1em;color:#c83a4a;text-shadow:0 4px 20px #000}
+#deathOverlay p{font-size:14px;color:#ccc;max-width:400px}
+#deathOverlay .dbtn{margin-top:12px;background:var(--ok);border:0;color:#fff;padding:14px 32px;border-radius:10px;font-weight:700;letter-spacing:.1em;cursor:pointer;font-size:15px}
+
+@media (orientation:portrait){
+  #tilt{display:flex}
+  #home,#stage,#boot,#authScreen,#serverScreen{filter:blur(6px)}
+}
+@media (max-height:420px){
+  #weather{display:none !important}
+  .help{font-size:10px;padding:4px 10px}
+  .chat{font-size:10px;bottom:calc(180px + var(--safe-b))}
+}
+@media (max-height:360px){
+  .chat{display:none}
+}
+</style>
+</head>
+<body>
+<div id="tilt"><b>ПОВЕРНИТЕ УСТРОЙСТВО</b><span>Mo0nlyy Russia работает только в ландшафте</span></div>
+
+<div id="boot">
+  <div class="crescent"></div>
+  <div class="boot-name">MO<span>0</span>NLYY</div>
+  <div class="boot-sub">RUSSIA ONLINE</div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="blog" id="blog"></div>
+  <label id="mapUploadWrap" style="display:none;margin-top:8px;cursor:pointer">
+    <input type="file" id="mapUpload" accept=".zip,.jpg,.jpeg,.png" style="display:none">
+    <span style="display:inline-block;padding:10px 22px;border:1px solid var(--gold);border-radius:10px;color:var(--gold);letter-spacing:.1em;font-size:12px;background:#0a0d14">📂 Выбрать карту вручную (map.zip или map.jpg)</span>
+  </label>
+</div>
+
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="crescent"></div>
+      <div class="boot-name">MO<span>0</span>NLYY</div>
+      <div class="boot-sub">RUSSIA ONLINE</div>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="register">Регистрация</button>
+      <button class="auth-tab" data-tab="login">Вход</button>
+    </div>
+    <div class="auth-group" data-panel="register">
+      <label>ЛОГИН
+        <input id="regLogin" type="text" maxlength="20" autocomplete="username" placeholder="например: ivan_2026">
+      </label>
+      <label>EMAIL
+        <input id="regEmail" type="email" autocomplete="email" placeholder="ivan@mail.ru">
+      </label>
+      <label>ПАРОЛЬ
+        <input id="regPass" type="password" maxlength="40" autocomplete="new-password" placeholder="минимум 6 символов">
+      </label>
+      <label>ПОВТОР ПАРОЛЯ
+        <input id="regPass2" type="password" maxlength="40" autocomplete="new-password" placeholder="повторите пароль">
+      </label>
+      <div class="auth-error" id="regErr"></div>
+      <button class="auth-btn" id="regBtn">СОЗДАТЬ АККАУНТ</button>
+      <p class="auth-note">После регистрации на вашу почту придёт приветственное письмо.</p>
+    </div>
+    <div class="auth-group" data-panel="login" style="display:none">
+      <label>ЛОГИН
+        <input id="logLogin" type="text" maxlength="20" autocomplete="username" placeholder="ivan_2026">
+      </label>
+      <label>ПАРОЛЬ
+        <input id="logPass" type="password" maxlength="40" autocomplete="current-password" placeholder="ваш пароль">
+      </label>
+      <div class="auth-error" id="logErr"></div>
+      <button class="auth-btn" id="logBtn">ВОЙТИ</button>
+      <p class="auth-note">Нет аккаунта? Перейдите на вкладку «Регистрация».</p>
+    </div>
+  </div>
+</div>
+
+<div id="serverScreen">
+  <div class="srv-screen-wrap">
+    <div class="srv-screen-title">Выбор сервера</div>
+    <div class="srv-screen-sub">Каждый сервер — отдельный мир со своими жителями и экономикой</div>
+    <div class="srv-screen-list" id="srvScreenList"></div>
+    <button class="srv-screen-cancel" id="srvScreenCancel">Отмена</button>
+  </div>
+</div>
+
+<div id="home">
+  <header class="top">
+    <div class="brand"><i></i><div>MO0NLYY<small>RUSSIA</small></div></div>
+    <nav>
+      <button class="active" data-tab="play">Игра</button>
+      <button data-tab="news">Новости</button>
+      <button id="btnHelp">Как играть</button>
+      <button id="btnSet">Настройки</button>
+    </nav>
+    <div class="ver">build 1.7.3</div>
+  </header>
+  <aside class="side">
+    <h3>📰 НОВОСТИ СЕРВЕРА</h3>
+    <div class="news">
+      <article><time>03.10.26</time><div>Патч 1.7.3: отдельный экран выбора сервера — Crimson и Prime.</div></article>
+      <article><time>03.10.26</time><div>Патч 1.7.2: новый HUD для телефона, кнопки не налезают.</div></article>
+      <article><time>02.10.26</time><div>Патч 1.7.1: фикс спавна в текстурах Вокзала.</div></article>
+      <article><time>01.10.26</time><div>Патч 1.7: карта грузится из map.zip.</div></article>
+    </div>
+  </aside>
+  <section class="hero">
+    <div class="hero-hint">
+      <b>Шаг 1.</b> Сервер &nbsp;·&nbsp; <b>Шаг 2.</b> Ник &nbsp;·&nbsp; <b>Шаг 3.</b> Нажмите «Войти в игру»
+    </div>
+    <div class="current-server">
+      <div class="cs-label">ТЕКУЩИЙ СЕРВЕР</div>
+      <div class="cs-name" id="csName">— не выбран —</div>
+      <div class="cs-desc" id="csDesc">Нажмите «Сменить сервер», чтобы выбрать Crimson или Prime.</div>
+      <button class="cs-btn" id="btnChangeServer">🔄 Сменить сервер</button>
+    </div>
+  </section>
+  <aside class="cast">
+    <h3>👤 ВАШ ПЕРСОНАЖ</h3>
+    <canvas id="prev" width="220" height="240"></canvas>
+    <div class="skins">
+      <button id="skinL" title="Предыдущий">◀</button>
+      <div id="skinN" class="hint" style="min-width:80px;text-align:center">скин 1</div>
+      <button id="skinR" title="Следующий">▶</button>
+    </div>
+    <p class="hint" style="margin-top:10px;text-align:center;line-height:1.5">Меняйте образ ◀ ▶. В игре его можно купить за 500 ₽.</p>
+    <p class="hint" id="motd">Выберите сервер</p>
+  </aside>
+  <footer class="foot">
+    <div class="foot-row">
+      <label class="field">ВАШ НИКНЕЙМ
+        <input id="nick" maxlength="16" placeholder="Например: Ivan123" autocomplete="off">
+      </label>
+      <div class="hint" id="netst">состояние сети: —</div>
+      <button class="play" id="play" disabled>ВОЙТИ В ИГРУ</button>
+    </div>
+    <div class="help-line">Управление: <b>WASD/стик</b> — движение · <b>E</b> — действие · <b>F</b> — транспорт · <b>P</b> — телефон · <b>I</b> — инвентарь · <b>T</b> — чат · <b>ESC</b> — пауза</div>
+  </footer>
+</div>
+
+<div id="stage">
+  <canvas id="view"></canvas>
+  <div id="hud">
+    <div class="money" id="money">0 ₽</div>
+    <div class="stars" id="stars"></div>
+    <div class="stats">
+      <b class="hp"><i id="hpb"></i></b>
+      <b class="a"><i id="arb"></i></b>
+      <b class="h"><i id="hnb"></i></b>
+    </div>
+    <div class="chat" id="chat"></div>
+    <div class="help" id="help"></div>
+    <div class="speed" id="speed">0<small>KM/H</small></div>
+    <div id="weather">⛈️ Гроза</div>
+    <canvas id="radar" width="122" height="122"></canvas>
+  </div>
+  <div id="stick"><div id="knob"></div></div>
+  <div class="acts">
+    <button id="bE">E<small>действие</small></button>
+    <button id="bF">F<small>транспорт</small></button>
+  </div>
+  <div class="dock">
+    <button id="bM">ESC<small>меню</small></button>
+    <button id="bT">T<small>чат</small></button>
+    <button id="bI">I<small>инвент.</small></button>
+    <button id="bP">P<small>телефон</small></button>
+  </div>
+  <input id="cinput" maxlength="86" placeholder="Сообщение или /pay /me /do /gps">
+  <div class="panel" id="inv"></div>
+  <div class="panel" id="dlg"></div>
+  <div class="panel" id="menu"></div>
+  <div class="phone" id="phone"></div>
+  <div class="toast" id="toast"></div>
+  <div id="eventBanner" style="position:absolute;left:50%;top:12%;transform:translateX(-50%);background:linear-gradient(180deg,#9b2233,#6a1a28);border:2px solid var(--gold);color:#fff;padding:10px 20px;font-weight:700;letter-spacing:.1em;display:none;z-index:20;box-shadow:0 8px 24px #000a;text-align:center;border-radius:10px"></div>
+  <div id="mgOverlay">
+    <button id="mgExit">✕ Выйти</button>
+    <div id="mgTitle">МИНИ-ИГРА</div>
+    <div id="mgInfo"><span>Очки: <b id="mgScore">0</b></span><span>Время: <b id="mgTime">15</b>с</span></div>
+    <canvas id="mgCanvas" width="560" height="340"></canvas>
+    <div id="mgResult"><h3 id="mgResTitle">Готово!</h3><p id="mgResText"></p><button id="mgClose">Забрать награду</button></div>
+  </div>
+  <button id="bRun">БЕГ</button>
+  <button id="bBrake">СТОП</button>
+</div>
+
+<div id="houseOverlay">
+  <div id="houseView">
+    <div id="houseInfo"><h3 id="houseTitle">Ваш дом</h3><div class="hint" id="houseSub">ESC — выйти</div></div>
+    <button id="houseExit">Выйти ✕</button>
+    <canvas id="houseCanvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+  </div>
+</div>
+
+<div id="deathOverlay">
+  <h1>ВЫ ПОГИБЛИ</h1>
+  <p id="deathInfo">Вас доставили в больницу Новолунска.</p>
+  <button class="dbtn" id="deathOk">Продолжить в больнице</button>
+</div>
+
+<div class="modal" id="emailModal">
+  <div class="sheet email-sheet">
+    <div class="email-header">
+      <div class="email-icon">✉️</div>
+      <div>
+        <h2>Письмо отправлено!</h2>
+        <p class="hint">На адрес <b id="emailTo">—</b></p>
+      </div>
+    </div>
+    <div class="email-body">
+      <div class="email-subject">Добро пожаловать в Mo0nlyy Russia!</div>
+      <p>Привет, <b id="emailName">—</b>!</p>
+      <p>Мы рады видеть тебя в Новолунске — городе, где каждый найдёт своё призвание.</p>
+      <p>Что тебя ждёт:</p>
+      <ul>
+        <li>12+ работ — от таксиста до шахтёра</li>
+        <li>Покупка машин, домов и одежды</li>
+        <li>Семья, банк, биржа и живые события</li>
+        <li>Карта с 10 районами и NPC</li>
+      </ul>
+      <p>Твой логин: <b id="emailLogin">—</b></p>
+      <p>Начни с Вокзала — там найдёшь работу. Удачи на дорогах Новолунска!</p>
+      <p style="text-align:right;color:var(--gold);margin-bottom:0">— Команда Mo0nlyy Russia</p>
+    </div>
+    <button class="auth-btn" id="emailOk" style="margin-top:14px">Продолжить</button>
+  </div>
+</div>
+
+<div class="modal" id="mdHelp"><div class="sheet">
+  <h2>Как играть в Mo0nlyy Russia</h2>
+  <p>Онлайн-город Новолунск с 10 районами. Работайте, покупайте машины, заводите семью.</p>
+  <h3>📱 УПРАВЛЕНИЕ</h3>
+  <ul>
+    <li><b>Стик / WASD</b> — движение и газ</li>
+    <li><b>БЕГ</b> — быстрый бег</li>
+    <li><b>F</b> — сесть/выйти из машины</li>
+    <li><b>E</b> — взаимодействие с зданием</li>
+    <li><b>P</b> — телефон (биржа, авто, семья, банк)</li>
+    <li><b>I</b> — инвентарь, <b>T</b> — чат, <b>ESC</b> — пауза</li>
+  </ul>
+  <h3>💼 КАК ЗАРАБОТАТЬ</h3>
+  <ul>
+    <li>Подойдите к Вокзалу и нажмите E — работы</li>
+    <li>Продавайте ресурсы на Бирже в телефоне</li>
+    <li>Кормите голодных NPC (🍲) — деньги и подсказки</li>
+    <li>Ищите золотые маркеры событий на карте</li>
+  </ul>
+  <h3>🏠 ДОМ И МАШИНЫ</h3>
+  <ul>
+    <li>Купите квартиру в Мэрии — можно входить через E</li>
+    <li>Купите авто в Автосалоне — оно появится рядом</li>
+    <li>Если HP падает до нуля — вас доставят в больницу со штрафом</li>
+  </ul>
+  <button onclick="this.closest('.modal').classList.remove('on')">Понятно</button>
+</div></div>
+<div class="modal" id="mdSet"><div class="sheet">
+  <h2>Настройки</h2>
+  <div class="row"><span>Графика</span><select id="gfx" style="background:#1b2430;border:1px solid var(--line);padding:6px 10px;border-radius:6px;color:#e7e4dc"><option value="1">высокая</option><option value="0">низкая</option></select></div>
+  <div class="row"><span>Звук</span><input id="vol" type="range" min="0" max="1" step="0.05" value="0.4"></div>
+  <button onclick="this.closest('.modal').classList.remove('on')">Закрыть</button>
+</div></div>
+
+<script>
+(function(){
+"use strict";
+const RTDB = "https://test-crimson-default-rtdb.firebaseio.com/mo0nlyy";
+const W = 4800, H = 4800, CHUNK = 256;
+
+const MAP_ZIP_URL = "map.zip";
+const MAP_IMG_URL = "map.jpg";
+let MAP_IMAGE = null, MAP_READY = false;
+
+async function unzipReadFile(arrayBuffer, targetName){
+  const view = new DataView(arrayBuffer);
+  const u8 = new Uint8Array(arrayBuffer);
+  let eocd = -1;
+  const scanFrom = Math.max(0, u8.length - 66000);
+  for (let i = u8.length - 22; i >= scanFrom; i--){
+    if (view.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error("Это не ZIP-архив");
+  const cdOffset = view.getUint32(eocd + 16, true);
+  const cdEntries = view.getUint16(eocd + 10, true);
+  const dec = new TextDecoder("utf-8");
+  let ptr = cdOffset;
+  for (let i = 0; i < cdEntries; i++){
+    if (view.getUint32(ptr, true) !== 0x02014b50) break;
+    const method = view.getUint16(ptr + 10, true);
+    const compSize = view.getUint32(ptr + 20, true);
+    const nameLen = view.getUint16(ptr + 28, true);
+    const extraLen = view.getUint16(ptr + 30, true);
+    const commentLen = view.getUint16(ptr + 32, true);
+    const localOffset = view.getUint32(ptr + 42, true);
+    const name = dec.decode(u8.subarray(ptr + 46, ptr + 46 + nameLen));
+    if (name === targetName || name.endsWith("/" + targetName)){
+      if (view.getUint32(localOffset, true) !== 0x04034b50)
+        throw new Error("Некорректный local header");
+      const lNameLen = view.getUint16(localOffset + 26, true);
+      const lExtraLen = view.getUint16(localOffset + 28, true);
+      const dataOffset = localOffset + 30 + lNameLen + lExtraLen;
+      const data = u8.subarray(dataOffset, dataOffset + compSize);
+      if (method === 0){
+        return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+      }
+      if (method === 8){
+        if (typeof DecompressionStream === "undefined")
+          throw new Error("Браузер не поддерживает распаковку deflate.");
+        const ds = new DecompressionStream("deflate-raw");
+        const writer = ds.writable.getWriter();
+        writer.write(data); writer.close();
+        const reader = ds.readable.getReader();
+        const chunks = [];
+        while (true){
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+        }
+        let total = 0;
+        for (const c of chunks) total += c.length;
+        const out = new Uint8Array(total);
+        let off = 0;
+        for (const c of chunks){ out.set(c, off); off += c.length; }
+        return out.buffer;
+      }
+      throw new Error("Метод сжатия не поддерживается: " + method);
+    }
+    ptr += 46 + nameLen + extraLen + commentLen;
+  }
+  throw new Error("Файл " + targetName + " не найден в архиве");
+}
+function imageFromBlobUrl(url){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = () => rej(new Error("Не удалось декодировать картинку"));
+    img.src = url;
+  });
+}
+async function loadFromZipUrl(zipUrl){
+  const resp = await fetch(zipUrl);
+  if (!resp.ok) throw new Error("HTTP " + resp.status);
+  const buf = await resp.arrayBuffer();
+  const mapBuf = await unzipReadFile(buf, "map.jpg");
+  const blob = new Blob([mapBuf], { type: "image/jpeg" });
+  return imageFromBlobUrl(URL.createObjectURL(blob));
+}
+async function loadFromJpgUrl(jpgUrl){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = () => rej(new Error("jpg не найден"));
+    img.src = jpgUrl;
+  });
+}
+async function loadMapImage(cb){
+  try {
+    const img = await loadFromZipUrl(MAP_ZIP_URL);
+    MAP_IMAGE = img; MAP_READY = true;
+    if (cb) cb(true, "zip"); return;
+  } catch(e){ console.warn("[map] map.zip:", e.message); }
+  try {
+    const img = await loadFromJpgUrl(MAP_IMG_URL);
+    MAP_IMAGE = img; MAP_READY = true;
+    if (cb) cb(true, "jpg"); return;
+  } catch(e){ console.warn("[map] map.jpg:", e.message); }
+  MAP_READY = false;
+  if (cb) cb(false, "none");
+}
+function applyLoadedMap(img, source){
+  MAP_IMAGE = img; MAP_READY = true;
+  S.chunks.clear(); S.chunkAge.length = 0;
+  log("Карта: " + img.width + "x" + img.height + " (" + source + ")");
+  document.getElementById("mapUploadWrap").style.display = "none";
+}
+function initMapUploadButton(){
+  const wrap = document.getElementById("mapUploadWrap");
+  const input = document.getElementById("mapUpload");
+  if (!wrap || !input) return;
+  if (!MAP_READY) wrap.style.display = "block";
+  input.onchange = async () => {
+    const f = input.files && input.files[0];
+    if (!f) return;
+    const name = f.name.toLowerCase();
+    try {
+      if (name.endsWith(".zip")){
+        const buf = await f.arrayBuffer();
+        const mapBuf = await unzipReadFile(buf, "map.jpg");
+        const blob = new Blob([mapBuf], { type: "image/jpeg" });
+        const img = await imageFromBlobUrl(URL.createObjectURL(blob));
+        applyLoadedMap(img, "zip");
+      } else if (/\.(jpg|jpeg|png)$/.test(name)){
+        const img = await imageFromBlobUrl(URL.createObjectURL(f));
+        applyLoadedMap(img, "jpg");
+      } else {
+        alert("Поддерживаются только .zip, .jpg, .jpeg, .png");
+      }
+    } catch(e){
+      console.error(e);
+      alert("Не удалось загрузить карту: " + e.message);
+    }
+  };
+}
+
+/* ============ СЕРВЕРЫ: только Crimson и Prime ============ */
+const DEFAULT_SERVERS = {
+  crimson: { name:"Mo0nlyy Russia | Crimson", mode:"RolePlay", maxPlayers:150, region:"RU-MOW", motd:"Основной сервер. Новолунск ждёт тебя.", desc:"Классический RolePlay со всеми работами и обновлениями." },
+  prime:   { name:"Mo0nlyy Russia | Prime",   mode:"RolePlay", maxPlayers:100, region:"RU-SPE", motd:"Премиум-сервер. Повышенные зарплаты и меньше машин.", desc:"Для опытных игроков. Строгие правила и высокие выплаты." }
+};
+const SKINS = [
+  {n:"Куртка", body:"#2b3a55", pants:"#1d2430", hair:"#1a120e", sex:0},
+  {n:"Спорт", body:"#3a6d4b", pants:"#202020", hair:"#3b2418", sex:0},
+  {n:"Деловой", body:"#1e1e24", pants:"#111114", hair:"#2a1c14", sex:0},
+  {n:"Качок", body:"#6a3030", pants:"#2a2a2a", hair:"#111", sex:0},
+  {n:"Рабочий", body:"#6b5a3a", pants:"#3a3328", hair:"#4a3018", sex:0},
+  {n:"Пальто", body:"#3a2a28", pants:"#1a1414", hair:"#c8b48a", sex:0},
+  {n:"Плащ", body:"#5a3a58", pants:"#241828", hair:"#1a0e08", sex:1},
+  {n:"Лето", body:"#c45a6a", pants:"#3a3048", hair:"#3a2010", sex:1},
+  {n:"Офис", body:"#d8d2c8", pants:"#2a2a32", hair:"#4a3018", sex:1},
+  {n:"Худи", body:"#2a4a6a", pants:"#1a1a22", hair:"#111", sex:1}
+];
+const CARS = [
+  {id:"vaz2107", n:"2107", col:"#c8c0b0", spd:210, price:18000, w:34, h:16},
+  {id:"priora", n:"Приора", col:"#1c3a78", spd:240, price:42000, w:36, h:16},
+  {id:"camry", n:"Camry", col:"#c0c4c8", spd:260, price:145000, w:40, h:18},
+  {id:"gazel", n:"Газель", col:"#c8b04a", spd:170, price:68000, w:46, h:20},
+  {id:"taxi", n:"Такси", col:"#d4b020", spd:220, price:0, w:36, h:16},
+  {id:"pp", n:"Патруль", col:"#d8dce0", spd:250, price:0, w:38, h:17},
+  {id:"bus", n:"ЛиАЗ", col:"#3a6a4a", spd:150, price:0, w:64, h:22},
+  {id:"kamaz", n:"КамАЗ", col:"#6a3a28", spd:140, price:0, w:58, h:22},
+  {id:"granta", n:"Гранта", col:"#8a2020", spd:200, price:25000, w:34, h:16},
+  {id:"vesta", n:"Веста", col:"#3a5a8a", spd:230, price:68000, w:38, h:17},
+  {id:"bmw", n:"BMW X5", col:"#1a1a1a", spd:280, price:320000, w:44, h:19},
+  {id:"mercedes", n:"Mercedes G", col:"#2a2a30", spd:270, price:450000, w:46, h:20},
+  {id:"porsche", n:"Porsche 911", col:"#d02020", spd:320, price:780000, w:42, h:17},
+  {id:"lada_niva", n:"Нива", col:"#4a6a3a", spd:180, price:38000, w:36, h:18},
+  {id:"uaz", n:"УАЗ Патриот", col:"#3a3a2a", spd:170, price:52000, w:38, h:19}
+];
+const FOOD_ITEMS = {"Шаурма":45,"Борщ":35,"Кофе":15,"Вода":12,"Суши":40,"Пицца":50};
+const MARKET_ITEMS = ["Доски", "Руда", "Рыба", "Картофель", "Деталь"];
+const MARKET_BASE = { "Доски": 200, "Руда": 700, "Рыба": 300, "Картофель": 120, "Деталь": 500 };
+const MARKET = {prices:{},history:{},supply:{},lastTick:0,tickInterval:120};
+function marketInit(){ MARKET_ITEMS.forEach(n=>{ MARKET.prices[n]=MARKET_BASE[n]; MARKET.history[n]=[MARKET_BASE[n]]; MARKET.supply[n]=0; }); MARKET.lastTick=performance.now(); }
+function marketTick(){
+  const now = performance.now();
+  if (now - MARKET.lastTick < MARKET.tickInterval * 1000) return;
+  MARKET.lastTick = now;
+  MARKET_ITEMS.forEach(n=>{
+    const base = MARKET_BASE[n]; const sold = MARKET.supply[n]||0;
+    const pressure = Math.min(0.4, sold*0.02); const noise = (Math.random()-0.5)*0.2;
+    let next = MARKET.prices[n]*(1-pressure+noise);
+    next = Math.max(base*0.5, Math.min(base*1.8, next));
+    MARKET.prices[n] = Math.round(next);
+    MARKET.history[n].push(MARKET.prices[n]);
+    if (MARKET.history[n].length > 30) MARKET.history[n].shift();
+    MARKET.supply[n] = 0;
+  });
+}
+function marketSell(name, qty){ if(!MARKET_ITEMS.includes(name)) return false; MARKET.supply[name]=(MARKET.supply[name]||0)+qty; return true; }
+
+const EVENT_TYPES = [
+  { id: "vein",   name: "💎 Жила руды",    color: "#6ad8ff", reward: { item: "Руда", qty: 3, money: 1200 }, dur: 45, radius: 40 },
+  { id: "crate",  name: "🎁 Потерянный груз", color: "#ffb84a", reward: { item: "Деталь", qty: 2, money: 800 }, dur: 40, radius: 36 },
+  { id: "cash",   name: "💰 Инкассаторская", color: "#b6e3b0", reward: { money: 2500 }, dur: 30, radius: 38 },
+  { id: "fishRun",name: "🐟 Ход рыбы",     color: "#4ea3ff", reward: { item: "Рыба", qty: 5, money: 600 },  dur: 50, radius: 42 },
+  { id: "storm",  name: "⛈️ Гроза",        color: "#a0a0c0", reward: null, dur: 60, radius: 0, weather: true }
+];
+let ACTIVE_EVENT = null; let EVENT_COOLDOWN = 0;
+function spawnRandomEvent(){
+  if (ACTIVE_EVENT) return;
+  const ev = EVENT_TYPES[Math.floor(Math.random()*EVENT_TYPES.length)];
+  const x = 500 + Math.random()*(W-1000); const y = 500 + Math.random()*(H-1000);
+  ACTIVE_EVENT = { def: ev, x, y, expire: performance.now() + ev.dur*1000 };
+  if (ev.weather) S.weather = 1;
+  showEventBanner(ev.name, ev.weather ? "Скоро" : "Найдите и нажмите E", 4000);
+  toast(ev.name);
+}
+function endEvent(){ if(!ACTIVE_EVENT) return; if(ACTIVE_EVENT.def.weather) S.weather=0; ACTIVE_EVENT=null; EVENT_COOLDOWN=performance.now()+60000; }
+function showEventBanner(title, subtitle, ms){
+  const el = document.getElementById("eventBanner");
+  el.innerHTML = '<div style="font-size:14px;margin-bottom:2px">'+title+'</div><div style="font-size:11px;font-weight:500;opacity:.85">'+subtitle+'</div>';
+  el.classList.add("on");
+  clearTimeout(showEventBanner._t);
+  showEventBanner._t = setTimeout(()=>el.classList.remove("on"), ms||3500);
+}
+function assignHungryNPCs(){ S.npcs.forEach((n,i)=>{ n.hungry=(i%7===0)&&!n.taxi; n.rescued=false; }); }
+
+const uid = (function(){ let id=localStorage.getItem("mr_uid"); if(!id){ id="p"+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); localStorage.setItem("mr_uid",id); } return id; })();
+const S = {
+  nick: localStorage.getItem("mr_nick") || "", skin: +(localStorage.getItem("mr_skin")||0),
+  gfx: 1, vol: 0.4, ping: 0, servers: {}, sel: null, online: {},
+  me: null, others: {}, vehs: [], npcs: [], traffic: [],
+  buildings: [], roads: [], places: [], trees: [], waterZones: [], bridges: [],
+  grid: new Map(), chunks: new Map(), chunkAge: [],
+  cam:{x:0,y:0,z:1}, stick:{dx:0,dy:0,on:false},
+  keys: Object.create(null), time: 8, weather: 0,
+  job: null, waypoint: null, chat: [], lastPulse: 0, lastPoll: 0, lastSave: 0,
+  sid: null, running: false, paused: false, dirty:false, insideHouse: false, dead:false
+};
+const view = document.getElementById("view");
+const ctx = view.getContext("2d");
+const radar = document.getElementById("radar");
+const rtx = radar.getContext("2d");
+const prev = document.getElementById("prev");
+const ptx = prev.getContext("2d");
+const houseCanvas = document.getElementById("houseCanvas");
+const hctx = houseCanvas.getContext("2d");
+let ac=null, lastTs=0, toastT=0, houseRaf=0;
+
+function log(m){ const el=document.getElementById("blog"); el.innerText=(el.innerText?el.innerText+"\n":"")+m; el.scrollTop=999; }
+function setBar(v){ document.getElementById("bar").style.width=(v*100)+"%"; }
+function toast(t){ const e=document.getElementById("toast"); e.textContent=t; e.style.display="block"; toastT=2.4; }
+function moneyStr(n){ const v = Math.floor(Math.max(0, n)); return v.toLocaleString("ru-RU").replace(/\u00A0/g, " ") + " ₽"; }
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+function shadeColor(color, percent){
+  if(!color || color.length<7) return color||"#000000";
+  let R=parseInt(color.substring(1,3),16), G=parseInt(color.substring(3,5),16), B=parseInt(color.substring(5,7),16);
+  R=Math.min(255,Math.max(0,parseInt(R*(100+percent)/100)));
+  G=Math.min(255,Math.max(0,parseInt(G*(100+percent)/100)));
+  B=Math.min(255,Math.max(0,parseInt(B*(100+percent)/100)));
+  return "#"+R.toString(16).padStart(2,'0')+G.toString(16).padStart(2,'0')+B.toString(16).padStart(2,'0');
+}
+async function fb(path, method, body){
+  const t0=performance.now();
+  const r = await fetch(RTDB+"/"+path+".json", {
+    method: method||"GET",
+    headers: body? {"Content-Type":"application/json"}:undefined,
+    body: body? JSON.stringify(body):undefined
+  });
+  S.ping = Math.round(performance.now()-t0);
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return r.json();
+}
+function beep(f,d,type){
+  if(!ac||S.vol<=0) return;
+  try{ const o=ac.createOscillator(),g=ac.createGain(); o.type=type||"square"; o.frequency.value=f; g.gain.value=S.vol*0.04; g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+d); o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime+d); }catch(e){}
+}
+function unlockAudio(){ if(ac) return; try{ ac=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+
+/* AUTH */
+async function hashPass(pass){
+  try {
+    const enc = new TextEncoder();
+    const buf = await crypto.subtle.digest("SHA-256", enc.encode(pass + "::mo0nlyy_v1_salt"));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+  } catch(e){
+    let h = 0; const s = pass + "::mo0nlyy_v1_salt";
+    for (let i = 0; i < s.length; i++){ h = (h * 31 + s.charCodeAt(i)) | 0; }
+    return "fb" + Math.abs(h).toString(16);
+  }
+}
+function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function showAuthScreen(){ document.getElementById("authScreen").classList.add("on"); document.getElementById("home").classList.remove("on"); }
+function hideAuthScreen(){ document.getElementById("authScreen").classList.remove("on"); }
+function checkAuth(){
+  const auth = localStorage.getItem("mr_auth");
+  if (auth) { try { const data = JSON.parse(auth); if (data && data.login) return data; } catch(e){} }
+  return null;
+}
+document.querySelectorAll(".auth-tab").forEach(tab => {
+  tab.onclick = () => {
+    const t = tab.dataset.tab;
+    document.querySelectorAll(".auth-tab").forEach(x => x.classList.toggle("active", x === tab));
+    document.querySelectorAll(".auth-group").forEach(g => {
+      g.style.display = (g.dataset.panel === t) ? "flex" : "none";
+    });
+  };
+});
+document.getElementById("regBtn").onclick = async () => {
+  const err = document.getElementById("regErr");
+  const login = document.getElementById("regLogin").value.trim();
+  const email = document.getElementById("regEmail").value.trim();
+  const p1 = document.getElementById("regPass").value;
+  const p2 = document.getElementById("regPass2").value;
+  err.textContent = "";
+  if (login.length < 3) { err.textContent = "Логин минимум 3 символа"; return; }
+  if (!/^[a-zA-Z0-9_\-]+$/.test(login)) { err.textContent = "Только латиница, цифры, _ и -"; return; }
+  if (!isValidEmail(email)) { err.textContent = "Некорректный email"; return; }
+  if (p1.length < 6) { err.textContent = "Пароль минимум 6 символов"; return; }
+  if (p1 !== p2) { err.textContent = "Пароли не совпадают"; return; }
+  const btn = document.getElementById("regBtn");
+  btn.disabled = true; btn.textContent = "СОЗДАЁМ...";
+  try {
+    const existing = await fb("accounts/" + login);
+    if (existing) { err.textContent = "Логин занят"; btn.disabled = false; btn.textContent = "СОЗДАТЬ АККАУНТ"; return; }
+    const hash = await hashPass(p1);
+    let myUid = localStorage.getItem("mr_uid");
+    if (!myUid) { myUid = "p"+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); localStorage.setItem("mr_uid", myUid); }
+    await fb("accounts/" + login, "PUT", { email, passHash: hash, uid: myUid, createdAt: Date.now() });
+    localStorage.setItem("mr_auth", JSON.stringify({ login, email, uid: myUid }));
+    localStorage.setItem("mr_nick", login);
+    await sendWelcomeEmail(email, login);
+    document.getElementById("emailTo").textContent = email;
+    document.getElementById("emailName").textContent = login;
+    document.getElementById("emailLogin").textContent = login;
+    document.getElementById("emailModal").classList.add("on");
+    btn.disabled = false; btn.textContent = "СОЗДАТЬ АККАУНТ";
+    document.getElementById("emailOk").onclick = () => {
+      document.getElementById("emailModal").classList.remove("on");
+      hideAuthScreen();
+      document.getElementById("home").classList.add("on");
+      document.getElementById("nick").value = login;
+    };
+  } catch(e) {
+    console.error(e);
+    err.textContent = "Ошибка соединения";
+    btn.disabled = false; btn.textContent = "СОЗДАТЬ АККАУНТ";
+  }
+};
+document.getElementById("logBtn").onclick = async () => {
+  const err = document.getElementById("logErr");
+  const login = document.getElementById("logLogin").value.trim();
+  const pass = document.getElementById("logPass").value;
+  err.textContent = "";
+  if (!login || !pass) { err.textContent = "Заполните все поля"; return; }
+  const btn = document.getElementById("logBtn");
+  btn.disabled = true; btn.textContent = "ВХОДИМ...";
+  try {
+    const acc = await fb("accounts/" + login);
+    if (!acc) { err.textContent = "Аккаунт не найден"; btn.disabled = false; btn.textContent = "ВОЙТИ"; return; }
+    const hash = await hashPass(pass);
+    if (acc.passHash !== hash) { err.textContent = "Неверный пароль"; btn.disabled = false; btn.textContent = "ВОЙТИ"; return; }
+    localStorage.setItem("mr_auth", JSON.stringify({ login, email: acc.email, uid: acc.uid }));
+    localStorage.setItem("mr_nick", login);
+    if (acc.uid && acc.uid !== localStorage.getItem("mr_uid")) localStorage.setItem("mr_uid", acc.uid);
+    btn.disabled = false; btn.textContent = "ВОЙТИ";
+    hideAuthScreen();
+    document.getElementById("home").classList.add("on");
+    document.getElementById("nick").value = login;
+    toast("С возвращением, " + login + "!");
+  } catch(e) {
+    console.error(e);
+    err.textContent = "Ошибка соединения";
+    btn.disabled = false; btn.textContent = "ВОЙТИ";
+  }
+};
+async function sendWelcomeEmail(email, login){
+  console.log("[EMAIL] Отправка на", email, "для", login);
+  try {
+    await fb("outbox/" + Date.now() + "_" + login, "PUT", {
+      to: email, subject: "Добро пожаловать в Mo0nlyy Russia!",
+      body: "Привет, " + login + "! Спасибо за регистрацию.",
+      at: Date.now()
+    });
+  } catch(e){}
+}
+
+/* ============ ЭКРАН ВЫБОРА СЕРВЕРА ============ */
+function openServerScreen(){
+  const screen = document.getElementById("serverScreen");
+  const list = document.getElementById("srvScreenList");
+  list.innerHTML = "";
+  const ids = Object.keys(S.servers);
+  if (!ids.length){
+    list.innerHTML = "<div class='srv-big' style='cursor:default;text-align:center;color:#5b6370'>Серверы не загружены. Проверьте соединение.</div>";
+  } else {
+    ids.forEach(id => {
+      const s = S.servers[id] || {};
+      const on = s.online||0, max = s.maxPlayers||100;
+      const isCrimson = id === "crimson";
+      const isPrime = id === "prime";
+      const cls = isCrimson ? "crimson" : (isPrime ? "prime" : "");
+      const clsName = isCrimson ? "crimson" : (isPrime ? "prime" : "");
+      const card = document.createElement("div");
+      card.className = "srv-big " + cls;
+      card.innerHTML =
+        "<div class='srv-big-name " + clsName + "'>" + esc(s.name || id) + "</div>" +
+        "<div class='srv-big-desc'>" + esc(s.desc || s.motd || "") + "</div>" +
+        "<div class='srv-big-meta'>" +
+          "<span class='srv-big-badge'>" + esc(s.mode || "RP") + "</span>" +
+          "<span class='srv-big-badge online'>" + on + " / " + max + " онлайн</span>" +
+          "<span class='srv-big-badge region'>" + esc(s.region || "—") + "</span>" +
+          (S.ping ? "<span class='srv-big-badge ping'>" + S.ping + " мс</span>" : "") +
+        "</div>";
+      card.onclick = () => selectServer(id);
+      list.appendChild(card);
+    });
+  }
+  screen.classList.add("on");
+}
+function closeServerScreen(){
+  document.getElementById("serverScreen").classList.remove("on");
+}
+function selectServer(id){
+  S.sel = id;
+  closeServerScreen();
+  renderCurrentServer();
+  document.getElementById("play").disabled = false;
+  const s = S.servers[id];
+  if (s) document.getElementById("motd").textContent = "✅ " + (s.motd || s.name || id);
+  toast("Выбран сервер: " + (s ? (s.name || id) : id));
+}
+function renderCurrentServer(){
+  const nameEl = document.getElementById("csName");
+  const descEl = document.getElementById("csDesc");
+  if (!S.sel || !S.servers[S.sel]){
+    nameEl.textContent = "— не выбран —";
+    descEl.textContent = "Нажмите «Сменить сервер», чтобы выбрать Crimson или Prime.";
+    return;
+  }
+  const s = S.servers[S.sel];
+  nameEl.textContent = s.name || S.sel;
+  descEl.textContent = (s.desc || s.motd || "") + " · " + (s.online||0) + "/" + (s.maxPlayers||100) + " игроков · " + (s.region||"—");
+}
+document.getElementById("btnChangeServer").onclick = openServerScreen;
+document.getElementById("srvScreenCancel").onclick = closeServerScreen;
+
+/* МИР */
+function hroad(y,x0,x1,w){ S.roads.push({x:x0,y:y-w/2,w:x1-x0,h:w,k:1}); }
+function vroad(x,y0,y1,w){ S.roads.push({x:x-w/2,y:y0,w:w,h:y1-y0,k:0}); }
+function tryAddB(x,y,w,h,roof,kind,label){
+  const PAD=2;
+  for(const b of S.buildings){
+    if(x-PAD < b.x+b.w && x+w+PAD > b.x && y-PAD < b.y+b.h && y+h+PAD > b.y) return null;
+  }
+  const b = {x,y,w,h,roof,kind,label}; S.buildings.push(b); return b;
+}
+function forceAddB(x,y,w,h,roof,kind,label){
+  const b = {x,y,w,h,roof,kind,label}; S.buildings.push(b); return b;
+}
+function buildingAt(place, sizeW, sizeH, roof, kind){
+  const cx0 = place.x - sizeW/2;
+  const cy0 = place.y + 30;
+  const offsets = [[0,0],[15,0],[-15,0],[0,15],[0,-15],[25,25],[-25,25],[25,-25],[-25,-25],[35,0],[-35,0],[0,35],[0,-35],[45,45],[-45,45],[45,-45],[-45,-45],[55,0],[-55,0],[0,55],[0,-55]];
+  for(const [dx,dy] of offsets){
+    const b = tryAddB(cx0+dx, cy0+dy, sizeW, sizeH, roof, kind || place.k, place.n);
+    if(b) return b;
+  }
+  return forceAddB(cx0, cy0, sizeW, sizeH, roof, kind || place.k, place.n);
+}
+function hitRect(b,x,y,r){
+  const cx=Math.max(b.x,Math.min(x,b.x+b.w));
+  const cy=Math.max(b.y,Math.min(y,b.y+b.h));
+  const dx=x-cx,dy=y-cy; return dx*dx+dy*dy<r*r;
+}
+function pointInRect(b,x,y,pad){ pad=pad||0; return x>b.x-pad && x<b.x+b.w+pad && y>b.y-pad && y<b.y+b.h+pad; }
+function onRoad(x,y){ for(const r of S.roads){ if(x>=r.x&&y>=r.y&&x<=r.x+r.w&&y<=r.y+r.h) return r; } return null; }
+function inWater(x,y){ for(const wz of S.waterZones){ if(x>=wz.x && x<=wz.x+wz.w && y>=wz.y && y<=wz.y+wz.h) return true; } return false; }
+function isFreeSpot(x,y,radius){
+  if(x<60||y<60||x>W-60||y>H-60) return false;
+  if(inWater(x,y)) return false;
+  for(const b of S.buildings){ if(pointInRect(b,x,y,radius)) return false; }
+  return true;
+}
+function isFreeSpotForCar(x, y, r){
+  if (x < 60 || y < 60 || x > W-60 || y > H-60) return false;
+  if (inWater(x, y)) return false;
+  for (const b of S.buildings){ if (pointInRect(b, x, y, r + 8)) return false; }
+  for (const v of S.vehs){ if (Math.hypot(v.x - x, v.y - y) < 50) return false; }
+  return true;
+}
+function findFreeCarSpot(cx, cy){
+  const r = 22;
+  for (let radius = 50; radius <= 400; radius += 20){
+    for (let ang = 0; ang < Math.PI * 2; ang += Math.PI / 12){
+      const x = cx + Math.cos(ang) * radius;
+      const y = cy + Math.sin(ang) * radius;
+      if (isFreeSpotForCar(x, y, r)) return { x, y };
+    }
+  }
+  return { x: cx + 220, y: cy + 220 };
+}
+function findSafeSpawn(preferred){
+  if (!blocked(preferred.x, preferred.y, 12)) return { x: preferred.x, y: preferred.y };
+  for (let radius = 30; radius <= 300; radius += 20){
+    for (let ang = 0; ang < Math.PI * 2; ang += Math.PI / 12){
+      const x = preferred.x + Math.cos(ang) * radius;
+      const y = preferred.y + Math.sin(ang) * radius;
+      if (!blocked(x, y, 12) && !inWater(x, y)) return { x, y };
+    }
+  }
+  const statPlace = S.places.find(p => p.id === "spawn");
+  if (statPlace){
+    for (let radius = 60; radius <= 400; radius += 30){
+      for (let ang = 0; ang < Math.PI * 2; ang += Math.PI / 12){
+        const x = statPlace.x + Math.cos(ang) * radius;
+        const y = statPlace.y + Math.sin(ang) * radius;
+        if (!blocked(x, y, 12) && !inWater(x, y)) return { x, y };
+      }
+    }
+  }
+  return { x: 2400, y: 2400 };
+}
+
+function buildWorld(){
+  S.buildings.length=0; S.roads.length=0; S.places.length=0; S.trees.length=0; S.waterZones.length=0;
+
+  S.waterZones = [
+    {x: 900,  y: 1900, w: 1500, h: 1200},
+    {x: 2200, y: 2200, w: 400,  h: 600},
+    {x: 300,  y: 2800, w: 700,  h: 500},
+    {x: 2400, y: 2800, w: 500,  h: 400},
+    {x: 3400, y: 300,  w: 500,  h: 300}
+  ];
+
+  S.places = [
+    {id:"farm",    n:"Ферма Эдово",     x:350,  y:250,  k:"farm"},
+    {id:"lumber",  n:"Лесопилка",       x:600,  y:400,  k:"lumber"},
+    {id:"club",    n:"Клуб Луна",       x:400,  y:850,  k:"club"},
+    {id:"cafe",    n:"Кафе Батырево",   x:3050, y:200,  k:"cafe"},
+    {id:"gas2",    n:"АЗС Север",       x:3300, y:300,  k:"gas"},
+    {id:"air",     n:"Аэропорт",        x:2750, y:400,  k:"air"},
+    {id:"admin",   n:"Мэрия",           x:2750, y:900,  k:"admin"},
+    {id:"gov",     n:"Правительство",   x:2950, y:900,  k:"gov"},
+    {id:"med",     n:"Больница",        x:3150, y:900,  k:"med"},
+    {id:"gas",     n:"АЗС Арзамас",     x:2550, y:900,  k:"gas"},
+    {id:"bank",    n:"Банк",            x:2750, y:1080, k:"bank"},
+    {id:"pd",      n:"МВД",             x:2950, y:1080, k:"pd"},
+    {id:"car",     n:"Автосалон",       x:3150, y:1080, k:"car"},
+    {id:"shop1",   n:"Магнит",          x:2650, y:1250, k:"shop"},
+    {id:"spawn",   n:"Вокзал",          x:2850, y:1250, k:"stat"},
+    {id:"shop2",   n:"Пятёрочка",       x:3050, y:1250, k:"shop"},
+    {id:"cloth",   n:"Магазин одежды",  x:3250, y:1250, k:"cloth"},
+    {id:"apt1",    n:"Квартира Рублёвка", x:400, y:1600, k:"house"},
+    {id:"apt2",    n:"Особняк Рублёвка",  x:600, y:1650, k:"house"},
+    {id:"villa1",  n:"Вилла Рублёвка",    x:400, y:1800, k:"house"},
+    {id:"fish",    n:"Рыбный причал",   x:600,  y:2350, k:"fish"},
+    {id:"mafia",   n:"Бар Бригада",     x:850,  y:2400, k:"mafia"},
+    {id:"ems",     n:"Скорая",          x:700,  y:2600, k:"ems"},
+    {id:"car2",    n:"Автосалон Гарель", x:4100, y:2350, k:"car"},
+    {id:"repair",  n:"СТО Гарель",       x:4100, y:2550, k:"repair"},
+    {id:"shop3",   n:"Магазин Гарель",   x:3850, y:2450, k:"shop"},
+    {id:"gas3",    n:"АЗС Гарель",       x:3900, y:2250, k:"gas"},
+    {id:"media",   n:"Луна-ТВ",          x:3650, y:2150, k:"media"},
+    {id:"gai",     n:"ГИБДД",           x:2500, y:3400, k:"gai"},
+    {id:"mine",    n:"Шахта",           x:2750, y:3550, k:"mine"},
+    {id:"factory", n:"Завод",           x:2100, y:4000, k:"factory"},
+    {id:"apt3",    n:"Дом Бусаево",     x:2000, y:4200, k:"house"},
+    {id:"port",    n:"Порт",            x:4000, y:4200, k:"port"},
+    {id:"garage1", n:"Гараж Южный",     x:3800, y:4150, k:"house"}
+  ];
+
+  vroad(2900, 200, 4200, 90);
+  hroad(1080, 600, 4400, 80);
+  hroad(300, 600, 3400, 70);
+  vroad(3100, 200, 1100, 70);
+  hroad(1650, 400, 2900, 70);
+  hroad(2300, 3000, 4400, 80);
+  vroad(700, 1700, 3200, 70);
+  vroad(2200, 3000, 4300, 80);
+  hroad(4150, 3400, 4400, 90);
+  vroad(4000, 3400, 4400, 80);
+  hroad(3400, 2200, 3000, 70);
+
+  const sizes = {
+    farm:[100,80,"#6a5a2a"], lumber:[100,80,"#4a3a28"], club:[110,85,"#3a1a3a"],
+    cafe:[100,80,"#5a3a2a"], gas2:[75,60,"#2a4a2a"], air:[150,110,"#3a4048"],
+    admin:[130,90,"#6a1c1c"], gov:[130,90,"#2a2a3a"], med:[140,95,"#d8dce0"],
+    gas:[75,60,"#2a4a2a"], bank:[110,85,"#3a5a3a"], pd:[120,95,"#2a3a5a"],
+    car:[150,100,"#4a4a52"], shop1:[110,75,"#3a2a20"], spawn:[160,90,"#4a4a48"],
+    shop2:[110,75,"#3a2a20"], cloth:[100,80,"#5a3a5a"],
+    apt1:[85,70,"#6a4a3a"], apt2:[110,85,"#4a3a48"], villa1:[120,100,"#5a3a3a"],
+    fish:[100,75,"#4a3a2a"], mafia:[110,80,"#3a2a2a"], ems:[110,85,"#2a3a5a"],
+    car2:[150,100,"#4a4a52"], repair:[120,90,"#3a3a4a"], shop3:[110,75,"#3a2a20"],
+    gas3:[75,60,"#2a4a2a"], media:[120,85,"#2a2a4a"],
+    gai:[110,85,"#3a3a3a"], mine:[130,100,"#3a2a4a"],
+    factory:[160,110,"#2a3a3a"], apt3:[95,75,"#5a3a28"],
+    port:[180,130,"#4a3a28"], garage1:[95,75,"#4a4040"]
+  };
+
+  S.places.forEach(p => {
+    const s = sizes[p.id] || [110,85,"#3a3a3a"];
+    buildingAt(p, s[0], s[1], s[2], p.k);
+  });
+
+  S.bridges.push({x:2700, y:2400, w:200, h:600});
+  S.bridges.push({x:750, y:2800, w:200, h:200});
+
+  for(let i=0;i<180;i++){
+    const x=200+Math.random()*(W-400), y=200+Math.random()*(H-400);
+    if(onRoad(x,y) || inWater(x,y)) continue;
+    if(!isFreeSpot(x,y,14)) continue;
+    let blockedByPlace=false;
+    for(const p of S.places){ if(Math.hypot(p.x-x,p.y-y)<70){ blockedByPlace=true; break; } }
+    if(blockedByPlace) continue;
+    S.trees.push({x,y,r:6+Math.random()*5});
+  }
+
+  spawnTraffic(); spawnParked(); spawnNpcs(); assignHungryNPCs();
+}
+function findFreeSpotNear(cx, cy, radiusMin, radiusMax, tries){
+  tries = tries || 40;
+  for(let i=0;i<tries;i++){
+    const ang = Math.random()*Math.PI*2;
+    const r = radiusMin + Math.random()*(radiusMax-radiusMin);
+    const x = cx + Math.cos(ang)*r, y = cy + Math.sin(ang)*r;
+    if(isFreeSpot(x,y,14)) return {x,y};
+  }
+  return null;
+}
+function spawnParked(){
+  S.vehs = [];
+  const spots = [
+    [2950,1000,0,4],[3020,1000,0,0],[2750,1050,1.57,2],[2820,1050,1.57,1],
+    [2950,2350,0,5],[3020,2350,0,5],[4050,4050,0,7],[4000,4100,0,3],
+    [2100,4050,0,0],[2200,4050,0,1],[650,2200,0,3],[750,2300,0,4],
+    [3150,250,1.57,2],[2900,1150,0,6],[500,1700,0,1],[600,1750,0,2]
+  ];
+  spots.forEach((s,i)=>{
+    const m = CARS[s[3]];
+    S.vehs.push({id:"v"+i, model:s[3], x:s[0], y:s[1], a:s[2], spd:0, fuel:40+Math.random()*60, col:m.col, owner:null, npc:false});
+  });
+}
+function spawnTraffic(){
+  S.traffic = [];
+  const lanes = [
+    {x:2900,y:500,a:Math.PI/2},{x:2900,y:500,a:-Math.PI/2},
+    {x:1500,y:1080,a:0},{x:1500,y:1080,a:Math.PI},
+    {x:4000,y:2300,a:0},{x:2200,y:3500,a:Math.PI/2}
+  ];
+  for(let i=0;i<12;i++){
+    const L = lanes[i%lanes.length];
+    const m = (i%7===0)?5:(i%5===0)?4:(i%3);
+    S.traffic.push({x:L.x+(Math.random()*80-40), y:L.y+Math.random()*800, a:L.a, model:m, spd:70+Math.random()*50, col:CARS[m].col, wantedCop: m===5});
+  }
+}
+const NPCNAME = ["Сергей","Олег","Марина","Игорь","Катя","Паша","Люда","Витя","Настя","Борис","Рита","Гриша","Алина","Дима","Женя","Таня","Юра","Лена","Костя","Инна","Федя","Оля","Саша","Вера","Рома","Ника","Ян","Зоя"];
+function spawnNpcs(){
+  S.npcs = [];
+  for(let i=0;i<26;i++){
+    const p = S.places[i%S.places.length];
+    let pos = findFreeSpotNear(p.x, p.y, 90, 160, 50);
+    if(!pos) pos = findFreeSpotNear(2900, 1080, 200, 800, 80);
+    if(!pos) continue;
+    S.npcs.push({
+      x:pos.x, y:pos.y, a:Math.random()*6.28,
+      skin:(i*3)%SKINS.length, n:NPCNAME[i%NPCNAME.length],
+      wait:Math.random()*4, taxi:i%4===0,
+      hungry:(i%7===0) && (i%4!==0), rescued:false
+    });
+  }
+}
+
+/* РЕНДЕР */
+function paintChunk(c, gx, gy){
+  const g = c.getContext("2d");
+  const x0=gx*CHUNK, y0=gy*CHUNK;
+  if(MAP_READY && MAP_IMAGE){
+    const sx = (x0 / W) * MAP_IMAGE.width;
+    const sy = (y0 / H) * MAP_IMAGE.height;
+    const sw = (CHUNK / W) * MAP_IMAGE.width;
+    const sh = (CHUNK / H) * MAP_IMAGE.height;
+    try{ g.drawImage(MAP_IMAGE, sx, sy, sw, sh, 0, 0, CHUNK, CHUNK); }
+    catch(e){ g.fillStyle="#2e462c"; g.fillRect(0,0,CHUNK,CHUNK); }
+  } else {
+    g.fillStyle="#2e462c"; g.fillRect(0,0,CHUNK,CHUNK);
+  }
+  for(const wz of S.waterZones){
+    const ix=Math.max(wz.x,x0), iy=Math.max(wz.y,y0);
+    const ax=Math.min(wz.x+wz.w,x0+CHUNK), ay=Math.min(wz.y+wz.h,y0+CHUNK);
+    if(ax<=ix||ay<=iy) continue;
+    g.fillStyle = "rgba(40, 80, 160, 0.18)";
+    g.fillRect(ix-x0, iy-y0, ax-ix, ay-iy);
+  }
+  for(const r of S.roads){
+    const ix=Math.max(r.x,x0), iy=Math.max(r.y,y0);
+    const ax=Math.min(r.x+r.w,x0+CHUNK), ay=Math.min(r.y+r.h,y0+CHUNK);
+    if(ax<=ix||ay<=iy) continue;
+    g.fillStyle = "rgba(30, 30, 30, 0.35)";
+    g.fillRect(ix-x0, iy-y0, ax-ix, ay-iy);
+    g.strokeStyle = "rgba(200,192,112,0.25)"; g.lineWidth = 1.5; g.setLineDash([8,8]);
+    g.beginPath();
+    if(r.k){ g.moveTo(ix-x0, (r.y+r.h/2)-y0); g.lineTo(ax-x0, (r.y+r.h/2)-y0); }
+    else { g.moveTo((r.x+r.w/2)-x0, iy-y0); g.lineTo((r.x+r.w/2)-x0, ay-y0); }
+    g.stroke(); g.setLineDash([]);
+  }
+  for(const b of S.buildings){
+    if(b.x > x0+CHUNK || b.y > y0+CHUNK || b.x+b.w < x0 || b.y+b.h < y0) continue;
+    const bx = b.x - x0, by = b.y - y0;
+    g.fillStyle = "rgba(0,0,0,0.35)"; g.fillRect(bx + 5, by + 6, b.w, b.h);
+    const grad = g.createLinearGradient(bx, by, bx + b.w, by + b.h);
+    grad.addColorStop(0, b.roof); grad.addColorStop(1, shadeColor(b.roof, -25));
+    g.fillStyle = grad; g.fillRect(bx, by, b.w, b.h);
+    g.strokeStyle = "rgba(0,0,0,0.55)"; g.lineWidth = 1.5;
+    g.strokeRect(bx + 0.5, by + 0.5, b.w, b.h);
+    const winW = 6, winH = 7, gapX = 12, gapY = 14;
+    for(let wy = 10; wy < b.h - 8; wy += gapY){
+      for(let wx = 8; wx < b.w - 8; wx += gapX){
+        g.fillStyle = "rgba(255,220,140,0.25)"; g.fillRect(bx + wx, by + wy, winW, winH);
+        g.fillStyle = "rgba(255,255,255,0.35)"; g.fillRect(bx + wx, by + wy, winW, 2);
+      }
+    }
+    const doorW = Math.min(12, b.w * 0.2);
+    g.fillStyle = "rgba(0,0,0,0.7)";
+    g.fillRect(bx + b.w/2 - doorW/2, by + b.h - 6, doorW, 6);
+    if(b.kind==="admin" || b.kind==="gov" || b.kind==="pd" || b.kind==="bank" || b.kind==="med"){
+      g.fillStyle = shadeColor(b.roof, 25); g.fillRect(bx - 2, by - 3, b.w + 4, 5);
+    }
+    if(b.label){
+      g.font = "bold 10px Segoe UI, Arial"; g.textAlign = "center";
+      g.shadowColor = "#000"; g.shadowBlur = 3; g.fillStyle = "#fff";
+      g.fillText(b.label, bx + b.w/2, by - 4);
+      g.shadowBlur = 0; g.textAlign = "left";
+    }
+  }
+  for(const t of S.trees){
+    if(t.x<x0||t.y<y0||t.x>x0+CHUNK||t.y>y0+CHUNK) continue;
+    g.fillStyle = "rgba(0,0,0,0.3)"; g.beginPath(); g.arc(t.x-x0+1, t.y-y0+2, t.r, 0, 6.28); g.fill();
+    g.fillStyle = "#1a3018"; g.beginPath(); g.arc(t.x-x0, t.y-y0, t.r, 0, 6.28); g.fill();
+    g.fillStyle = "#2a5020"; g.beginPath(); g.arc(t.x-x0-1, t.y-y0-2, t.r*0.6, 0, 6.28); g.fill();
+  }
+}
+function getChunk(cx,cy){
+  const k=cx+","+cy;
+  if(S.chunks.has(k)) return S.chunks.get(k);
+  if(S.chunkAge.length>40){ const old=S.chunkAge.shift(); S.chunks.delete(old); }
+  const c=document.createElement("canvas");
+  c.width=CHUNK; c.height=CHUNK;
+  paintChunk(c,cx,cy);
+  S.chunks.set(k,c); S.chunkAge.push(k);
+  return c;
+}
+function resize(){
+  const dpr = Math.min(S.gfx?1.5:1, window.devicePixelRatio||1);
+  view.width = innerWidth*dpr; view.height = innerHeight*dpr;
+  view.style.width = innerWidth+"px"; view.style.height = innerHeight+"px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+function drawPed(g,x,y,a,skin,name,local){
+  const sk = SKINS[skin%SKINS.length];
+  g.save(); g.translate(x,y); g.rotate(a);
+  g.fillStyle="rgba(0,0,0,0.3)"; g.beginPath(); g.ellipse(0,8,12,6,0,0,6.28); g.fill();
+  g.fillStyle=sk.pants; g.fillRect(-5,0,4,10); g.fillRect(1,0,4,10);
+  g.fillStyle=sk.body; g.fillRect(-7,-8,14,12);
+  g.fillStyle="rgba(255,255,255,0.08)"; g.fillRect(-7,-8,14,4);
+  g.fillStyle="#d4b08c"; g.beginPath(); g.arc(0,-12,5,0,6.28); g.fill();
+  g.fillStyle=sk.hair; g.beginPath(); g.arc(0,-14,5,Math.PI,0); g.fill();
+  if(sk.sex) g.fillRect(-6,-16,12,3);
+  g.restore();
+  if(name){
+    g.fillStyle=local?"#ffe08a":"#e8e8e8"; g.font="11px Segoe UI, Arial"; g.textAlign="center";
+    g.shadowColor="#000"; g.shadowBlur=3; g.fillText(name,x,y-22); g.shadowBlur=0; g.textAlign="left";
+  }
+}
+function drawCar(g,v,a){
+  const m = CARS[v.model];
+  g.save(); g.translate(v.x,v.y); g.rotate(a);
+  g.fillStyle="rgba(0,0,0,0.4)"; g.beginPath(); g.ellipse(0,10,m.w*0.5,10,0,0,6.28); g.filter="blur(3px)"; g.fill(); g.filter="none";
+  g.fillStyle=v.col||m.col; g.fillRect(-m.w/2,-m.h/2,m.w,m.h);
+  const bodyGrad=g.createLinearGradient(-m.w/2,-m.h/2,-m.w/2,m.h/2);
+  bodyGrad.addColorStop(0,"rgba(255,255,255,0.15)"); bodyGrad.addColorStop(0.5,"rgba(255,255,255,0)"); bodyGrad.addColorStop(1,"rgba(0,0,0,0.2)");
+  g.fillStyle=bodyGrad; g.fillRect(-m.w/2,-m.h/2,m.w,m.h);
+  g.fillStyle="#8ad0ee55"; g.fillRect(-m.w/2+6,-m.h/2+2,m.w*0.38,m.h-4);
+  g.fillStyle="#111"; g.fillRect(m.w/2-8,-m.h/2+2,5,4); g.fillRect(m.w/2-8,m.h/2-6,5,4);
+  if(v.model===5){ g.fillStyle="#1a3a8a"; g.fillRect(-6,-m.h/2,12,4); g.fillRect(-6,m.h/2-4,12,4); }
+  if(v.model===4){ g.fillStyle="#222"; g.font="8px Arial"; g.fillText("TAXI",-10,3); }
+  g.restore();
+}
+function nightAlpha(){
+  const t=S.time;
+  if(t>6 && t<8) return (8-t)/2*0.7;
+  if(t>=8 && t<18) return 0;
+  if(t>=18 && t<20) return (t-18)/2*0.7;
+  return 0.7;
+}
+function draw(){
+  const w=innerWidth, h=innerHeight;
+  const me=S.me; if(!me) return;
+  const tz = me.veh?0.72:1.05;
+  S.cam.z += (tz-S.cam.z)*0.08;
+  S.cam.x += (me.x-S.cam.x)*0.12;
+  S.cam.y += (me.y-S.cam.y)*0.12;
+  ctx.fillStyle="#102010"; ctx.fillRect(0,0,w,h);
+  ctx.save();
+  ctx.translate(w/2,h/2); ctx.scale(S.cam.z,S.cam.z); ctx.translate(-S.cam.x,-S.cam.y);
+  const x0=S.cam.x-w/S.cam.z/2, y0=S.cam.y-h/S.cam.z/2;
+  const x1=S.cam.x+w/S.cam.z/2, y1=S.cam.y+h/S.cam.z/2;
+  const cx0=Math.floor(x0/CHUNK), cy0=Math.floor(y0/CHUNK);
+  const cx1=Math.floor(x1/CHUNK), cy1=Math.floor(y1/CHUNK);
+  for(let cy=cy0; cy<=cy1; cy++) for(let cx=cx0; cx<=cx1; cx++){
+    if(cx<0||cy<0||cx>=W/CHUNK||cy>=H/CHUNK) continue;
+    ctx.drawImage(getChunk(cx,cy), cx*CHUNK, cy*CHUNK);
+  }
+  if(S.waypoint){
+    ctx.strokeStyle="#c9a56a"; ctx.setLineDash([6,6]);
+    ctx.beginPath(); ctx.moveTo(me.x,me.y); ctx.lineTo(S.waypoint.x,S.waypoint.y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle="#c9a56a"; ctx.beginPath(); ctx.arc(S.waypoint.x,S.waypoint.y,7,0,6.28); ctx.fill();
+  }
+  if(S.job&&S.job.mark){ ctx.fillStyle="#f0d030"; ctx.beginPath(); ctx.arc(S.job.mark.x,S.job.mark.y,9,0,6.28); ctx.fill(); }
+  for(const n of S.npcs){
+    if(n.x<x0-20||n.y<y0-20||n.x>x1+20||n.y>y1+20) continue;
+    drawPed(ctx,n.x,n.y,n.a,n.skin,null,false);
+    if(n.hungry && !n.rescued){ ctx.font="14px Arial"; ctx.textAlign="center"; ctx.fillText("🍲",n.x,n.y-26); ctx.textAlign="left"; }
+  }
+  for(const t of S.traffic){
+    if(t.x<x0-40||t.y<y0-40||t.x>x1+40||t.y>y1+40) continue;
+    drawCar(ctx,t,t.a);
+  }
+  for(const v of S.vehs){
+    if(me.veh===v) continue;
+    if(v.x<x0-40||v.y<y0-40||v.x>x1+40||v.y>y1+40) continue;
+    drawCar(ctx,v,v.a);
+  }
+  for(const id in S.others){
+    const o=S.others[id]; if(!o) continue;
+    o.dx += (o.x-o.dx)*0.25; o.dy += (o.y-o.dy)*0.25;
+    if(o.v>=0) drawCar(ctx,{x:o.dx,y:o.dy,model:o.v,col:CARS[o.v].col},o.a);
+    else drawPed(ctx,o.dx,o.dy,o.a,o.s,o.n,false);
+  }
+  if(me.veh) drawCar(ctx,me.veh,me.veh.a);
+  else drawPed(ctx,me.x,me.y,me.a,me.skin,me.name,true);
+  if(ACTIVE_EVENT && !ACTIVE_EVENT.def.weather){
+    const ev=ACTIVE_EVENT.def;
+    const t=performance.now()*0.005;
+    const pulse=1+Math.sin(t)*0.2;
+    ctx.save(); ctx.translate(ACTIVE_EVENT.x,ACTIVE_EVENT.y);
+    const grad=ctx.createRadialGradient(0,0,0,0,0,ev.radius*3*pulse);
+    grad.addColorStop(0,ev.color+"cc"); grad.addColorStop(0.4,ev.color+"33"); grad.addColorStop(1,ev.color+"00");
+    ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(0,0,ev.radius*3*pulse,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=ev.color; ctx.beginPath(); ctx.arc(0,0,ev.radius,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle="#fff"; ctx.lineWidth=2; ctx.stroke();
+    ctx.font="20px Arial"; ctx.textAlign="center"; ctx.fillText(ev.name.split(" ")[0],0,7); ctx.textAlign="left";
+    ctx.restore();
+  }
+  const na = nightAlpha()*(S.weather?1.15:1);
+  if(na>0){ ctx.fillStyle="rgba(4,8,18,"+na+")"; ctx.fillRect(S.cam.x-w,S.cam.y-h,w*2,h*2); }
+  ctx.restore();
+  if(S.weather){
+    ctx.save(); ctx.strokeStyle="rgba(160,200,255,0.35)"; ctx.lineWidth=1;
+    const t=performance.now()*0.001;
+    for(let i=0;i<80;i++){
+      const rx=((i*137+t*200)%innerWidth), ry=((i*311+t*600)%innerHeight);
+      ctx.beginPath(); ctx.moveTo(rx,ry); ctx.lineTo(rx-2,ry+14); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  drawRadar(); hud();
+}
+function drawRadar(){
+  const me=S.me, R=61;
+  rtx.fillStyle="#0a1a0c"; rtx.fillRect(0,0,122,122);
+  rtx.save(); rtx.translate(R,R); rtx.scale(0.07,0.07); rtx.translate(-me.x,-me.y);
+  rtx.fillStyle="#333"; for(const r of S.roads){ rtx.fillRect(r.x,r.y,r.w,r.h); }
+  rtx.fillStyle="#555"; for(const b of S.buildings){ rtx.fillRect(b.x,b.y,b.w,b.h); }
+  rtx.fillStyle="#4ea3ff"; for(const id in S.others){ const o=S.others[id]; rtx.beginPath(); rtx.arc(o.x,o.y,25,0,6.28); rtx.fill(); }
+  if(S.waypoint){ rtx.fillStyle="#c9a56a"; rtx.beginPath(); rtx.arc(S.waypoint.x,S.waypoint.y,30,0,6.28); rtx.fill(); }
+  if(S.job&&S.job.mark){ rtx.fillStyle="#f0d030"; rtx.beginPath(); rtx.arc(S.job.mark.x,S.job.mark.y,30,0,6.28); rtx.fill(); }
+  if(ACTIVE_EVENT&&!ACTIVE_EVENT.def.weather){ rtx.fillStyle=ACTIVE_EVENT.def.color; rtx.beginPath(); rtx.arc(ACTIVE_EVENT.x,ACTIVE_EVENT.y,32,0,6.28); rtx.fill(); }
+  rtx.fillStyle="#fff"; rtx.beginPath(); rtx.arc(me.x,me.y,28,0,6.28); rtx.fill();
+  rtx.restore();
+  rtx.strokeStyle="#c9a56a66"; rtx.strokeRect(0.5,0.5,121,121);
+}
+function hud(){
+  const me=S.me;
+  document.getElementById("money").textContent = moneyStr(me.money);
+  document.getElementById("hpb").style.width = Math.max(0,me.hp)+"%";
+  document.getElementById("arb").style.width = Math.max(0,me.armor)+"%";
+  document.getElementById("hnb").style.width = Math.max(0,me.hunger)+"%";
+  document.getElementById("stars").textContent = "★".repeat(me.wanted)+(me.wanted?"":"");
+  const sp = document.getElementById("speed");
+  if(me.veh){ sp.style.display="block"; sp.innerHTML = Math.abs(me.veh.spd|0)+"<small>KM/H  "+(me.veh.fuel|0)+"L</small>"; } else sp.style.display="none";
+  const near = interactTarget();
+  document.getElementById("help").textContent = near?("E — "+near.label):(me.veh?"F выйти · пробел ручник":"");
+  const wEl=document.getElementById("weather");
+  if(S.weather){ wEl.style.display="block"; wEl.textContent="⛈️ Гроза"; } else wEl.style.display="none";
+}
+function blocked(x,y,r){
+  if(x<40||y<40||x>W-40||y>H-40) return true;
+  if(inWater(x,y)) return true;
+  for(const p of S.places){
+    if(Math.hypot(p.x-x,p.y-y)<60) return false;
+  }
+  for(const b of S.buildings){ if(hitRect(b,x,y,r)) return true; }
+  return false;
+}
+function interactTarget(){
+  const me=S.me;
+  if(!me || me.dead) return null;
+  if(me.veh){
+    const gas = S.places.find(p=>p.k==="gas" && Math.hypot(p.x-me.x,p.y-me.y)<80);
+    if(gas) return {label:"заправить", kind:"gas", p:gas};
+  }
+  if(ACTIVE_EVENT && !ACTIVE_EVENT.def.weather){
+    if(Math.hypot(ACTIVE_EVENT.x-me.x, ACTIVE_EVENT.y-me.y) < ACTIVE_EVENT.def.radius+15)
+      return {label:"забрать: "+ACTIVE_EVENT.def.name, kind:"event"};
+  }
+  if(!me.veh && me.house){
+    if(Math.hypot(me.house.x-me.x, me.house.y-me.y) < 70)
+      return {label:"войти в дом", kind:"enterhouse"};
+  }
+  for(const p of S.places){
+    if(Math.hypot(p.x-me.x,p.y-me.y)<75) return {label:p.n, kind:p.k, p:p};
+  }
+  if(!me.veh){
+    let best=null, bd=48;
+    for(const v of S.vehs){
+      const d=Math.hypot(v.x-me.x,v.y-me.y);
+      if(d<bd){ bd=d; best=v; }
+    }
+    if(best) return {label:"сесть в "+CARS[best.model].n, kind:"carenter", v:best};
+  }
+  return null;
+}
+function respawnAtHospital(){
+  const me=S.me;
+  if(!me) return;
+  const med = S.places.find(p => p.id === "med") || S.places[0];
+  if(me.veh){ me.veh.driver = null; me.veh.spd = 0; me.veh = null; }
+  const fee = Math.min(me.money, 500);
+  me.money -= fee;
+  me.hp = 60; me.hunger = Math.max(30, me.hunger); me.wanted = 0;
+  const safe = findSafeSpawn({ x: med.x, y: med.y + 70 });
+  me.x = safe.x; me.y = safe.y; me.a = 0; me.dead = false;
+  document.getElementById("deathOverlay").classList.add("on");
+  document.getElementById("deathInfo").textContent =
+    "Вас доставили в больницу Новолунска. Штраф: " + moneyStr(fee) + ".";
+  beep(220, 0.3, "sawtooth");
+  saveSoon();
+}
+function closeDeathScreen(){
+  document.getElementById("deathOverlay").classList.remove("on");
+  toast("Вы в больнице. Будьте осторожнее!");
+}
+function step(dt){
+  const me=S.me; if(!me || S.paused) return;
+  if(S.insideHouse || me.dead) return;
+  S.time = (S.time + dt/40) % 24;
+  me.hunger = Math.max(0, me.hunger - dt*0.35);
+  if(me.hunger<=0) me.hp = Math.max(0, me.hp - dt*2);
+  if(me.hp <= 0 && !me.dead){ me.dead = true; respawnAtHospital(); return; }
+  if(me.wanted>0){ me.wantedT=(me.wantedT||0)+dt; if(me.wantedT>42){ me.wanted=0; me.wantedT=0; toast("Розыск снят"); } }
+  me.stam = Math.min(100,(me.stam||100)+dt*12);
+  let ix=S.stick.dx, iy=S.stick.dy;
+  if(S.keys["KeyW"]||S.keys["ArrowUp"]) iy-=1;
+  if(S.keys["KeyS"]||S.keys["ArrowDown"]) iy+=1;
+  if(S.keys["KeyA"]||S.keys["ArrowLeft"]) ix-=1;
+  if(S.keys["KeyD"]||S.keys["ArrowRight"]) ix+=1;
+  const mag = Math.hypot(ix,iy)||1; ix/=mag; iy/=mag;
+  if(me.veh){
+    const v=me.veh, m=CARS[v.model];
+    const thr=-iy, steer=ix;
+    v.spd += thr*(m.spd*0.55)*dt;
+    if(S.keys["Space"]) v.spd *= Math.pow(0.12,dt*4);
+    v.spd *= Math.pow(0.22,dt);
+    if(Math.abs(v.spd)>4) v.a += steer*dt*(v.spd>0?2.4:-2.4);
+    v.fuel = Math.max(0, v.fuel - Math.abs(v.spd)*dt*0.012);
+    if(v.fuel<=0) v.spd *= 0.2;
+    const nx=v.x+Math.cos(v.a)*v.spd*dt*1.1, ny=v.y+Math.sin(v.a)*v.spd*dt*1.1;
+    if(!blocked(nx,ny,18)){ v.x=nx; v.y=ny; } else { v.spd*=-0.3; me.hp=Math.max(0, me.hp-4*dt*Math.abs(v.spd)*0.02); }
+    me.x=v.x; me.y=v.y; me.a=v.a;
+    if(Math.abs(v.spd)>160 && Math.random()<dt*0.15) me.wanted=Math.min(3,me.wanted+1);
+  } else {
+    const run=(S.keys["ShiftLeft"]||S.keys["ShiftRight"]) && me.stam>5;
+    const sp=(run?165:95)*(me.hunger<15?0.7:1);
+    if(run) me.stam -= dt*28;
+    if(mag>0.15){
+      me.a = Math.atan2(iy,ix);
+      const nx=me.x+ix*sp*dt, ny=me.y+iy*sp*dt;
+      if(!blocked(nx,me.y,11)) me.x=nx;
+      if(!blocked(me.x,ny,11)) me.y=ny;
+    }
+  }
+  for(const n of S.npcs){
+    n.wait -= dt;
+    if(n.wait<0){ n.a+=(Math.random()-0.5)*1.2; n.wait=1+Math.random()*3; }
+    const nx=n.x+Math.cos(n.a)*28*dt, ny=n.y+Math.sin(n.a)*28*dt;
+    if(!blocked(nx,ny,10)){ n.x=nx; n.y=ny; } else n.a += 1.2;
+    if(me.jobId==="ems" && !n.healed && Math.hypot(n.x-me.x,n.y-me.y)<40 && Math.random()<dt*0.5){
+      n.healed=true; me.money+=200; toast("Пациент спасён: " + moneyStr(200)); saveSoon();
+    }
+    if(!n.hungry || n.rescued) continue;
+    if(Math.hypot(n.x-me.x,n.y-me.y)<42){
+      const hasFood = me.inv.some(it=>it && typeof it==="object" && FOOD_ITEMS[it.n]);
+      if(hasFood && Math.random()<dt*0.4){
+        n.rescued=true;
+        openDlg('<h2>🍲 Голодный прохожий</h2><p><b>'+esc(n.n)+'</b> просит еды. Дать что-нибудь?</p>' +
+          '<div class="row"><button class="go" data-a="feed" data-npc="'+esc(n.n)+'">Дать еду</button></div>' +
+          '<div class="row"><button class="go" data-a="x">Не сейчас</button></div>');
+      }
+    }
+  }
+  for(const t of S.traffic){
+    t.x += Math.cos(t.a)*t.spd*dt*0.7;
+    t.y += Math.sin(t.a)*t.spd*dt*0.7;
+    if(t.x<80||t.x>W-80||t.y<80||t.y>H-80|| inWater(t.x,t.y)){
+      t.a += Math.PI/2;
+      t.x=Math.max(120,Math.min(W-120,t.x));
+      t.y=Math.max(120,Math.min(H-120,t.y));
+    }
+    if(t.wantedCop && me.wanted>0 && Math.hypot(t.x-me.x,t.y-me.y)<520){
+      t.a=Math.atan2(me.y-t.y,me.x-t.x); t.spd=200;
+      if(Math.hypot(t.x-me.x,t.y-me.y)<38) arrest();
+    }
+  }
+  marketTick();
+  if(!ACTIVE_EVENT && performance.now()>EVENT_COOLDOWN && Math.random()<dt*0.008) spawnRandomEvent();
+  if(ACTIVE_EVENT && performance.now()>ACTIVE_EVENT.expire) endEvent();
+  if(S.job) tickJob(dt);
+  me.payT = (me.payT||0)+dt;
+  if(me.payT>600){ me.payT=0; let pay=1500;
+    if(me.jobId==="cop") pay=2800; else if(me.jobId==="ems") pay=2400;
+    else if(me.jobId==="media") pay=2200; else if(me.jobId==="mafia") pay=3100;
+    else if(me.jobId==="bus") pay=1800; else if(me.jobId) pay=1900;
+    me.money+=pay; me.bank+=400; toast("Зарплата: " + moneyStr(pay)); saveSoon();
+  }
+  if(toastT>0){ toastT-=dt; if(toastT<=0) document.getElementById("toast").style.display="none"; }
+
+  if (!me.veh && !me.dead){
+    if (blocked(me.x, me.y, 11)){
+      let freed = false;
+      for (let radius = 30; radius <= 200 && !freed; radius += 15){
+        for (let ang = 0; ang < Math.PI * 2 && !freed; ang += Math.PI / 8){
+          const nx = me.x + Math.cos(ang) * radius;
+          const ny = me.y + Math.sin(ang) * radius;
+          if (!blocked(nx, ny, 11) && !inWater(nx, ny)){
+            me.x = nx; me.y = ny;
+            freed = true;
+          }
+        }
+      }
+      if (freed) toast("Вы выбрались из здания");
+    }
+  }
+}
+function arrest(){
+  const me=S.me;
+  const fine=800*Math.max(1,me.wanted);
+  me.money=Math.max(0,me.money-fine); me.wanted=0; me.hp=70;
+  const med = S.places.find(p=>p.id==="med");
+  const safe = findSafeSpawn({ x: med.x, y: med.y + 40 });
+  me.x=safe.x; me.y=safe.y; if(me.veh){ me.veh.driver=null; me.veh=null; }
+  toast("Задержание. Штраф " + moneyStr(fine)); saveSoon();
+}
+
+/* РАБОТЫ */
+function startJob(type){
+  const me=S.me;
+  if(type==="taxi"){ const n=S.npcs.find(p=>p.taxi)||S.npcs[0]; S.job={type:"taxi",stage:"pick",mark:{x:n.x,y:n.y},n,pay:0}; toast("Заказ такси"); }
+  else if(type==="box"){ const a=S.places[4],b=S.places[8]; S.job={type:"box",stage:"pick",mark:{x:a.x,y:a.y},dest:b,pay:0}; toast("Заберите посылку"); }
+  else if(type==="port"){ S.job={type:"port",stage:"work",t:0,mark:S.places.find(p=>p.id==="port"),pay:0}; toast("Разгрузка"); }
+  else if(type==="cop"){ me.jobId="cop"; toast("Вы на смене МВД"); }
+  else if(type==="ems"){ me.jobId="ems"; toast("Вы на смене скорой"); }
+  else if(type==="lumber"){ S.job={type:"lumber",stage:"work",t:0,mark:S.places.find(p=>p.id==="lumber"),pay:0}; toast("Лесопилка"); }
+  else if(type==="fish"){ S.job={type:"fish",stage:"work",t:0,mark:S.places.find(p=>p.id==="fish"),pay:0}; toast("Рыбалка"); }
+  else if(type==="repair"){ S.job={type:"repair",stage:"work",t:0,mark:S.places.find(p=>p.id==="repair"),pay:0}; toast("СТО"); }
+  else if(type==="farm"){ S.job={type:"farm",stage:"work",t:0,mark:S.places.find(p=>p.id==="farm"),pay:0}; toast("Ферма"); }
+  else if(type==="mine"){ S.job={type:"mine",stage:"work",t:0,mark:S.places.find(p=>p.id==="mine"),pay:0}; toast("Шахта"); }
+  else if(type==="factory"){ S.job={type:"factory",stage:"work",t:0,mark:S.places.find(p=>p.id==="factory"),pay:0}; toast("Завод"); }
+  else if(type==="media"){ me.jobId="media"; toast("Вы репортёр"); }
+  else if(type==="mafia"){ me.jobId="mafia"; toast("Вы в бригаде"); }
+  else if(type==="bus"){ const bus=S.vehs.find(v=>v.model===6&&!v.driver); if(bus){ enterCar(bus); me.jobId="bus"; toast("Маршрут"); } else toast("Автобусов нет"); }
+}
+function tickJob(dt){
+  const me=S.me, j=S.job; if(!j) return;
+  if(j.type==="taxi"){
+    if(j.stage==="pick" && Math.hypot(me.x-j.mark.x,me.y-j.mark.y)<42 && me.veh){
+      const dest = S.places[(Math.random()*S.places.length)|0];
+      j.stage="drop"; j.mark={x:dest.x,y:dest.y}; j.pay=900+Math.hypot(me.x-dest.x,me.y-dest.y)*0.4;
+      toast("Везите: "+dest.n);
+    } else if(j.stage==="drop" && Math.hypot(me.x-j.mark.x,me.y-j.mark.y)<48){
+      me.money+=j.pay|0; toast("Оплата: " + moneyStr(j.pay)); S.job=null; saveSoon();
+    }
+  } else if(j.type==="box"){
+    if(j.stage==="pick" && Math.hypot(me.x-j.mark.x,me.y-j.mark.y)<48){
+      j.stage="drop"; j.mark={x:j.dest.x,y:j.dest.y}; j.pay=700+Math.random()*600;
+      toast("Доставьте: "+j.dest.n); give("Посылка",1);
+    } else if(j.stage==="drop" && Math.hypot(me.x-j.mark.x,me.y-j.mark.y)<48){
+      take("Посылка",1); me.money+=j.pay|0; toast("Доставлено"); S.job=null; saveSoon();
+    }
+  } else if(j.type==="port"){ if(Math.hypot(me.x-j.mark.x,me.y-j.mark.y)<90){ j.t+=dt; if(j.t>9){ me.money+=1100; j.t=0; toast("Смена: " + moneyStr(1100)); saveSoon(); } } }
+  else if(j.type==="lumber"){ if(Math.hypot(me.x-j.mark.x,me.y-j.mark.y)<90){ j.t+=dt; if(j.t>8){ me.money+=850; j.t=0; give("Доски",1); toast("Бревно"); saveSoon(); } } }
+  else if(j.type==="fish"){ if(Math.hypot(me.x-j.mark.x,me.y-j.mark.y)<90){ j.t+=dt; if(j.t>10){ me.money+=650; j.t=0; give("Рыба",1); toast("Улов"); saveSoon(); } } }
+  else if(j.type==="repair"){ if(Math.hypot(me.x-j.mark.x,me.y-j.mark.y)<90){ j.t+=dt; if(j.t>7){ me.money+=950; j.t=0; toast("Ремонт"); saveSoon(); } } }
+  else if(j.type==="farm"){ if(Math.hypot(me.x-j.mark.x,me.y-j.mark.y)<90){ j.t+=dt; if(j.t>8){ me.money+=700; j.t=0; give("Картофель",1); toast("Урожай"); saveSoon(); } } }
+  else if(j.type==="mine"){ if(Math.hypot(me.x-j.mark.x,me.y-j.mark.y)<90){ j.t+=dt; if(j.t>11){ me.money+=1200; j.t=0; give("Руда",1); toast("Руда"); saveSoon(); } } }
+  else if(j.type==="factory"){ if(Math.hypot(me.x-j.mark.x,me.y-j.mark.y)<90){ j.t+=dt; if(j.t>9){ me.money+=950; j.t=0; give("Деталь",1); toast("Смена"); saveSoon(); } } }
+  else if(j.type==="bus"){ if(!j.stops) j.stops=["spawn","shop1","med","bank","car","port"]; if(!j.idx) j.idx=0;
+    const tgt=S.places.find(p=>p.id===j.stops[j.idx]);
+    if(tgt && Math.hypot(me.x-tgt.x,me.y-tgt.y)<60){ j.idx=(j.idx+1)%j.stops.length; me.money+=350; toast("Остановка"); saveSoon(); }
+  }
+}
+function give(name, n){
+  if(typeof name!=="string" || !name) return;
+  n = Math.max(1, Math.floor(+n || 1));
+  if(!S.me.inv) S.me.inv = [];
+  const it = S.me.inv.find(i => i && typeof i==="object" && i.n === name);
+  if(it) it.q += n; else S.me.inv.push({ n: name, q: n });
+}
+function take(name,n){
+  n = Math.max(1, Math.floor(+n||1));
+  if(!S.me.inv) S.me.inv=[];
+  const idx = S.me.inv.findIndex(i=>i && typeof i==="object" && i.n===name);
+  if(idx<0) return false;
+  S.me.inv[idx].q -= n;
+  if(S.me.inv[idx].q<=0) S.me.inv.splice(idx,1);
+  return true;
+}
+function buy(name, price, fn){
+  const me=S.me;
+  if(me.money<price){ toast("Недостаточно денег"); return; }
+  me.money-=price; if(fn) fn(); saveSoon(); beep(520,.08);
+}
+
+/* UI */
+function closePanels(){
+  document.getElementById("inv").classList.remove("on");
+  document.getElementById("dlg").classList.remove("on");
+  document.getElementById("menu").classList.remove("on");
+  document.getElementById("phone").classList.remove("on");
+  document.getElementById("cinput").style.display="none";
+}
+function openDlg(html){ const e=document.getElementById("dlg"); e.innerHTML=html; e.classList.add("on"); }
+function doInteract(){
+  const t=interactTarget(); if(!t) return;
+  beep(340,.05);
+  if(t.kind==="carenter"){ enterCar(t.v); return; }
+  if(t.kind==="enterhouse"){ enterHouse(); return; }
+  if(t.kind==="event"){
+    if(!ACTIVE_EVENT) return;
+    const ev=ACTIVE_EVENT.def, me=S.me;
+    if(ev.reward){
+      if(ev.reward.item) give(ev.reward.item, ev.reward.qty);
+      if(ev.reward.money) me.money += ev.reward.money;
+      let msg="Получено: ";
+      if(ev.reward.item) msg += ev.reward.item+" x"+ev.reward.qty+" ";
+      if(ev.reward.money) msg += moneyStr(ev.reward.money);
+      toast(msg);
+    }
+    saveSoon(); endEvent(); return;
+  }
+  if(t.kind==="gas"){ openDlg("<h2>АЗС</h2><p>Литр — 42 ₽</p><div class='row'><span>Заправить 20 л</span><button class='go' data-a='gas20'>840 ₽</button></div><div class='row'><span>Полный бак</span><button class='go' data-a='gasfull'>оплатить</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="shop"){ openDlg("<h2>"+t.p.n+"</h2><div class='row'><span>Шаурма</span><button class='go' data-a='food'>120 ₽</button></div><div class='row'><span>Аптечка</span><button class='go' data-a='medkit'>450 ₽</button></div><div class='row'><span>Ремкомплект</span><button class='go' data-a='fix'>700 ₽</button></div><div class='row'><span>Вода</span><button class='go' data-a='water'>40 ₽</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="bank"){ openDlg("<h2>Банк</h2><p>Наличные: "+moneyStr(S.me.money)+" · счёт: "+moneyStr(S.me.bank)+"</p><div class='row'><span>Положить 1000 ₽</span><button class='go' data-a='dep'>OK</button></div><div class='row'><span>Снять 1000 ₽</span><button class='go' data-a='wd'>OK</button></div><div class='row'><span>Положить всё</span><button class='go' data-a='depall'>OK</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="car"){
+    let rows = CARS.filter(c=>c.price>0).map(c=>{
+      var ci=CARS.indexOf(c);
+      return "<div class='carCard'><div class='carTop'><b>"+c.n+"</b><span class='carPrice'>"+moneyStr(c.price)+"</span></div><div class='carStats'><span>Скорость: "+c.spd+" км/ч</span></div><button class='go' data-a='buycar' data-i='"+ci+"'>Купить</button></div>";
+    }).join("");
+    openDlg("<h2>Автосалон</h2><p style='font-size:11px;color:var(--dim)'>Машина появится на парковке у салона.</p>"+rows+"<div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return;
+  }
+  if(t.kind==="pd"){ openDlg("<h2>МВД</h2><div class='row'><button class='go red' data-a='jobcop'>Заступить</button></div><div class='row'><button class='go' data-a='jobems'>Перевод в скорую</button></div><div class='row'><button class='go' data-a='jobmedia'>Перевод в пресс-службу</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="med"){ openDlg("<h2>Больница</h2><div class='row'><span>Лечение</span><button class='go' data-a='heal'>500 ₽</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="stat"){ openDlg("<h2>Вокзал</h2><p>Работа для новичков.</p><div class='row'><button class='go' data-a='jobtaxi'>Таксист</button></div><div class='row'><button class='go' data-a='jobbox'>Курьер</button></div><div class='row'><button class='go' data-a='jobbus'>Автобус</button></div><div class='row'><button class='go' data-a='jobfish'>Рыбак</button></div><div class='row'><button class='go' data-a='joblumber'>Лесоруб</button></div><div class='row'><button class='go' data-a='jobfarm'>Фермер</button></div><div class='row'><button class='go' data-a='jobfactory'>Рабочий</button></div><div class='row'><button class='go' data-a='jobmine'>Шахтёр</button></div><div class='row'><button class='go' data-a='jobrepair'>Механик</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="port"){ openDlg("<h2>Порт</h2><div class='row'><button class='go' data-a='mgport'>Мини-игра</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="admin"){ openDlg("<h2>Мэрия</h2><div class='row'><button class='go' data-a='lic'>2000 ₽ — права</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="gov"){
+    var fam=S.me.family; var html="<h2>Правительство</h2>";
+    if(fam){
+      html+="<p>Семья: <b style='color:var(--gold)'>"+esc(fam.name)+"</b></p>";
+      fam.members.forEach(m=>{ html+="<div class='famMember'><span>"+esc(m.name)+"</span><span class='famRole'>"+m.role+"</span></div>"; });
+      html+="<div class='row'><button class='go' data-a='faminvite'>Пригласить</button></div><div class='row'><button class='go' data-a='famleave'>Покинуть</button></div>";
+    } else {
+      html+="<div class='famCreate'><p>Создайте семью за 15 000 ₽.</p><input id='famName' maxlength='20' placeholder='Название семьи' autocomplete='off'><button class='go' data-a='famcreate'>Создать (15 000 ₽)</button></div>";
+    }
+    html+="<div class='row'><button class='go' data-a='x'>Закрыть</button></div>"; openDlg(html); return;
+  }
+  if(t.kind==="gai"){ openDlg("<h2>ГИБДД</h2><div class='row'><button class='go' data-a='fine'>Оплатить 1500 ₽</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="house"){
+    var props = {"Квартира Рублёвка":45000,"Особняк Рублёвка":52000,"Вилла Рублёвка":350000,"Дом Бусаево":85000,"Гараж Южный":22000};
+    var pn=t.p.n, price = props[pn]||85000;
+    var owned = S.me.house && Math.abs(S.me.house.x-t.p.x)<5 && Math.abs(S.me.house.y-t.p.y)<5;
+    var html = "<h2>"+esc(pn)+"</h2>";
+    if(owned){
+      html += "<div class='propCard propOwned'><div class='propName'>"+esc(pn)+"</div><p style='color:var(--ok);text-align:center;padding:6px'>Ваша собственность</p><button class='go' data-a='enterhouse'>Войти в дом</button></div>";
+    } else {
+      html += "<div class='propCard'><div class='propName'>"+esc(pn)+"</div><div class='propPrice'>"+moneyStr(price)+"</div><button class='go' data-a='buyprop' data-x='"+t.p.x+"' data-y='"+t.p.y+"' data-p='"+price+"'>Купить</button></div>";
+    }
+    html += "<div class='row'><button class='go' data-a='x'>Закрыть</button></div>"; openDlg(html); return;
+  }
+  if(t.kind==="club"){ openDlg("<h2>Клуб Луна</h2><div class='row'><button class='go' data-a='club'>300 ₽</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="ems"){ openDlg("<h2>Скорая</h2><div class='row'><button class='go red' data-a='jobems'>Заступить</button></div><div class='row'><span>Лечение</span><button class='go' data-a='heal'>400 ₽</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="mafia"){ openDlg("<h2>Бар Бригада</h2><div class='row'><button class='go red' data-a='jobmafia'>Вступить</button></div><div class='row'><button class='go' data-a='mgmafia'>Контрабанда</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="lumber"){ openDlg("<h2>Лесопилка</h2><div class='row'><button class='go' data-a='mglumber'>Мини-игра</button></div><div class='row'><button class='go' data-a='sellwood'>Продать доски</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="repair"){ openDlg("<h2>СТО</h2><div class='row'><button class='go' data-a='mgrepair'>Мини-игра</button></div><div class='row'><span>Ремонт</span><button class='go' data-a='fixcar'>800 ₽</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="fish"){ openDlg("<h2>Рыбный причал</h2><div class='row'><button class='go' data-a='mgfish'>Мини-игра</button></div><div class='row'><button class='go' data-a='sellfish'>Продать рыбу</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="media"){ openDlg("<h2>Луна-ТВ</h2><div class='row'><button class='go' data-a='mgmedia'>Прямой эфир</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="farm"){ openDlg("<h2>Ферма</h2><div class='row'><button class='go' data-a='mgfarm'>Мини-игра</button></div><div class='row'><button class='go' data-a='sellpotato'>Продать урожай</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="mine"){ openDlg("<h2>Шахта</h2><div class='row'><button class='go' data-a='mgmine'>Мини-игра</button></div><div class='row'><button class='go' data-a='sellore'>Продать руду</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="factory"){ openDlg("<h2>Завод</h2><div class='row'><button class='go' data-a='mgfactory'>Мини-игра</button></div><div class='row'><button class='go' data-a='selpart'>Продать детали</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="cloth"){
+    var skinRows="";
+    SKINS.forEach(function(s,i){
+      var marker=(i===S.me.skin)?" <span style='color:var(--ok)'>(надет)</span>":"";
+      skinRows+="<div class='row'><span><b>"+esc(s.n)+"</b>"+marker+"</span><button class='go' data-a='wear' data-s='"+i+"'>"+(i===S.me.skin?"—":"500 ₽")+"</button></div>";
+    });
+    openDlg("<h2>👕 Магазин одежды</h2><p>Смена образа — 500 ₽.</p>"+skinRows+"<div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return;
+  }
+  if(t.kind==="cafe"){ openDlg("<h2>Кафе Уют</h2><div class='row'><span>Борщ</span><button class='go' data-a='borsch'>150 ₽</button></div><div class='row'><span>Кофе</span><button class='go' data-a='coffee'>60 ₽</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"); return; }
+  if(t.kind==="air"){ toast("Рейсы отменены"); }
+}
+document.getElementById("dlg").addEventListener("click", ev=>{
+  const b=ev.target.closest("[data-a]"); if(!b) return;
+  const a=b.getAttribute("data-a"); const me=S.me;
+  if(a==="x"){ document.getElementById("dlg").classList.remove("on"); return; }
+  if(a==="enterhouse"){ document.getElementById("dlg").classList.remove("on"); enterHouse(); return; }
+  if(a==="wear"){
+    var newSkin=+b.dataset.s;
+    if(newSkin===me.skin){ toast("Этот образ уже надет"); return; }
+    if(me.money<500){ toast("Нужно 500 ₽"); return; }
+    me.money-=500; me.skin=newSkin;
+    localStorage.setItem("mr_skin",""+newSkin); saveSoon();
+    toast("Образ: "+SKINS[newSkin].n);
+    setTimeout(()=>doInteract(),80); return;
+  }
+  if(a==="feed"){
+    const food = me.inv.find(it=>it && typeof it==="object" && FOOD_ITEMS[it.n]);
+    if(!food){ toast("Нет еды"); document.getElementById("dlg").classList.remove("on"); return; }
+    take(food.n,1);
+    const reward = 300+Math.floor(Math.random()*400);
+    me.money += reward;
+    if(Math.random()<0.4){
+      const p=S.places[Math.floor(Math.random()*S.places.length)];
+      S.waypoint=p;
+      toast("NPC подсказал: "+p.n+" · +"+moneyStr(reward));
+    } else toast("Вас поблагодарили · +"+moneyStr(reward));
+    saveSoon(); document.getElementById("dlg").classList.remove("on"); return;
+  }
+  if(a==="food")   buy("Шаурма",120,()=>{ give("Шаурма",1); toast("Куплено: Шаурма"); });
+  if(a==="water")  buy("Вода",40,()=>{ give("Вода",1); toast("Куплено: Вода"); });
+  if(a==="borsch") buy("Борщ",150,()=>{ give("Борщ",1); toast("Куплено: Борщ"); });
+  if(a==="coffee") buy("Кофе",60,()=>{ give("Кофе",1); toast("Куплено: Кофе"); });
+  if(a==="medkit") buy("Аптечка",450,()=>{ give("Аптечка",1); toast("Куплено: Аптечка"); });
+  if(a==="fix")    buy("Ремкомплект",700,()=>{ give("Ремкомплект",1); toast("Куплено: Ремкомплект"); });
+  if(a==="dep"){ if(me.money>=1000){ me.money-=1000; me.bank+=1000; saveSoon(); toast("Вклад"); } }
+  if(a==="wd"){ if(me.bank>=1000){ me.bank-=1000; me.money+=1000; saveSoon(); toast("Снято"); } }
+  if(a==="depall"){ me.bank+=me.money; me.money=0; saveSoon(); }
+  if(a==="heal") buy("лечение",500,()=>{ me.hp=100; me.armor=20; toast("Вы в порядке"); });
+  if(a==="lic") buy("права",2000,()=>{ me.lic=true; give("Права",1); toast("Права получены"); });
+  if(a==="fine") buy("штраф",1500,()=>{ me.wanted=0; toast("База чистая"); });
+  if(a==="club") buy("кальян",300,()=>{ me.hunger=Math.min(100,me.hunger+20); });
+  if(a==="buyprop"){ var price=+b.dataset.p; buy("недвижимость",price,()=>{ me.house={x:+b.dataset.x,y:+b.dataset.y}; toast("Собственность ваша!"); saveSoon(); }); }
+  if(a==="jobtaxi"){ startJob("taxi"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="jobbox"){ startJob("box"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="jobport"){ startJob("port"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="jobcop"){ startJob("cop"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="jobems"){ startJob("ems"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="jobmafia"){ startJob("mafia"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="joblumber"){ startJob("lumber"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="jobfish"){ startJob("fish"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="jobrepair"){ startJob("repair"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="jobfarm"){ startJob("farm"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="jobmine"){ startJob("mine"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="jobfactory"){ startJob("factory"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="jobmedia"){ startJob("media"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="jobbus"){ startJob("bus"); document.getElementById("dlg").classList.remove("on"); }
+  if(a==="sellwood"){   if(take("Доски",10)){   const p=MARKET.prices["Доски"]*10;     S.me.money+=p; marketSell("Доски",10);     saveSoon(); toast("Продано досок: " + moneyStr(p)); } else toast("Нет 10 досок"); }
+  if(a==="sellfish"){   if(take("Рыба",5)){     const p=MARKET.prices["Рыба"]*5;      S.me.money+=p; marketSell("Рыба",5);       saveSoon(); toast("Продано рыбы: " + moneyStr(p)); } else toast("Нет 5 рыб"); }
+  if(a==="sellpotato"){ if(take("Картофель",10)){const p=MARKET.prices["Картофель"]*10; S.me.money+=p; marketSell("Картофель",10); saveSoon(); toast("Продано картофеля: " + moneyStr(p)); } else toast("Нет 10 картофеля"); }
+  if(a==="sellore"){    if(take("Руда",5)){     const p=MARKET.prices["Руда"]*5;      S.me.money+=p; marketSell("Руда",5);       saveSoon(); toast("Продано руды: " + moneyStr(p)); } else toast("Нет 5 руды"); }
+  if(a==="selpart"){    if(take("Деталь",5)){   const p=MARKET.prices["Деталь"]*5;    S.me.money+=p; marketSell("Деталь",5);     saveSoon(); toast("Продано деталей: " + moneyStr(p)); } else toast("Нет 5 деталей"); }
+  if(a==="contra"){ if(take("Рыба",1)){ S.me.money+=3000; saveSoon(); toast("Контрабанда: " + moneyStr(3000)); } else toast("Нужна рыба"); }
+  if(a==="fixcar"){ if(S.me.veh){ buy("ремонт",800,()=>{ S.me.veh.fuel=Math.min(80,S.me.veh.fuel+20); toast("Машина в порядке"); }); } else toast("Вы не в машине"); }
+  if(a==="gas20"){ if(!me.veh) return; buy("бензин",840,()=>{ me.veh.fuel=Math.min(80,me.veh.fuel+20); toast("Заправлено"); }); }
+  if(a==="gasfull"){ if(!me.veh) return; const need=Math.ceil(80-me.veh.fuel); const cost=need*42; buy("бак",cost,()=>{ me.veh.fuel=80; toast("Полный бак"); }); }
+  if(a==="buycar"){
+    const i=+b.dataset.i, c=CARS[i];
+    buy(c.n, c.price, ()=>{
+      const carPlace = S.places.find(p => p.id === "car") || { x: 3150, y: 1080 };
+      const pos = findFreeCarSpot(carPlace.x, carPlace.y + 130);
+      const v = { id: "own"+uid+"_"+Date.now(), model: i, x: pos.x, y: pos.y, a: 0, spd: 0, fuel: 70, col: c.col, owner: uid, npc: false };
+      S.vehs.push(v); me.ownCar = i;
+      if (!me.myCars) me.myCars = [];
+      me.myCars.push(v.id);
+      toast("Ключи от " + c.n + " — машина у автосалона");
+    });
+  }
+  if(a && a.indexOf("mg")===0){ var type=a.slice(2); document.getElementById("dlg").classList.remove("on"); setTimeout(()=>startMiniGame(type),200); }
+  if(a==="famcreate"){
+    var nameEl=document.getElementById("famName"); var fname=nameEl?nameEl.value.trim():"";
+    if(fname.length<3){ toast("Название от 3 символов"); return; }
+    if(me.money<15000){ toast("Нужно 15 000 ₽"); return; }
+    me.money-=15000; me.family={name:fname, members:[{name:me.name, role:"Глава"}]};
+    saveSoon(); toast("Семья '"+fname+"' создана!"); document.getElementById("dlg").classList.remove("on");
+  }
+  if(a==="faminvite"){ var nn=["Сергей","Олег","Марина","Игорь","Катя"]; var roles=["Боец","Заместитель","Новичок"];
+    var nm={name:nn[Math.floor(Math.random()*nn.length)], role:roles[Math.floor(Math.random()*roles.length)]};
+    me.family.members.push(nm); saveSoon(); toast(nm.name+" вступил в семью"); document.getElementById("dlg").classList.remove("on");
+  }
+  if(a==="famleave"){ me.family=null; saveSoon(); toast("Вы покинули семью"); document.getElementById("dlg").classList.remove("on"); }
+});
+function isCarStuck(v){
+  for (const b of S.buildings){ if (hitRect(b, v.x, v.y, 18)) return true; }
+  return false;
+}
+function enterCar(v){
+  const me=S.me;
+  if(v.owner && v.owner!==uid){ toast("Чужая машина"); return; }
+  if (isCarStuck(v)){
+    const pos = findFreeCarSpot(v.x, v.y);
+    v.x = pos.x; v.y = pos.y; v.spd = 0;
+    toast("Машина вытащена на свободное место");
+  }
+  me.veh=v; v.driver=uid; beep(180,.12,"sawtooth");
+  document.getElementById("bBrake").classList.add("on");
+}
+function exitCar(){ const me=S.me; if(!me.veh) return; const v=me.veh;
+  const ex = v.x+Math.cos(v.a+1.57)*22;
+  const ey = v.y+Math.sin(v.a+1.57)*22;
+  const safe = findSafeSpawn({ x: ex, y: ey });
+  me.x=safe.x; me.y=safe.y;
+  v.spd=0; v.driver=null; me.veh=null;
+  document.getElementById("bBrake").classList.remove("on");
+}
+
+/* МОИ АВТО */
+function getMyCars(){ if(!S.me||!S.me.myCars) return []; return S.vehs.filter(v=>S.me.myCars.includes(v.id)); }
+function drawCarPreview(ctx2, model, w, h, col){
+  const m=CARS[model]; const cx=w/2, cy=h/2;
+  const scale=Math.min((w-20)/m.w,(h-20)/m.h)*1.1;
+  ctx2.save(); ctx2.translate(cx,cy); ctx2.scale(scale,scale);
+  ctx2.fillStyle="rgba(0,0,0,0.4)"; ctx2.beginPath(); ctx2.ellipse(0,8,m.w*0.5,5,0,0,Math.PI*2); ctx2.fill();
+  ctx2.fillStyle=col||m.col; ctx2.fillRect(-m.w/2,-m.h/2,m.w,m.h);
+  const grad=ctx2.createLinearGradient(-m.w/2,-m.h/2,-m.w/2,m.h/2);
+  grad.addColorStop(0,"rgba(255,255,255,0.18)"); grad.addColorStop(0.5,"rgba(255,255,255,0)"); grad.addColorStop(1,"rgba(0,0,0,0.25)");
+  ctx2.fillStyle=grad; ctx2.fillRect(-m.w/2,-m.h/2,m.w,m.h);
+  ctx2.fillStyle="#8ad0ee88"; ctx2.fillRect(-m.w/2+5,-m.h/2+2,m.w*0.34,m.h-4);
+  ctx2.strokeStyle="#000"; ctx2.lineWidth=1; ctx2.strokeRect(-m.w/2+0.5,-m.h/2+0.5,m.w,m.h);
+  ctx2.restore();
+}
+function openGarageApp(){
+  document.getElementById("phone").classList.remove("on");
+  const me=S.me; const my=getMyCars();
+  let html="<h2>🚗 Мои авто</h2>";
+  if(my.length===0){
+    html+="<p style='color:var(--dim);padding:10px;text-align:center'>У вас нет машин.</p>";
+    html+="<div class='row'><button class='go' data-a='x' style='width:100%'>Закрыть</button></div>";
+    openDlg(html); return;
+  }
+  html+="<p style='font-size:11px;color:var(--dim)'>Всего машин: "+my.length+"</p><div id='garageList'>";
+  my.forEach((v,idx)=>{
+    const m=CARS[v.model]; const active=(me.veh===v);
+    html+="<div class='carOwnedCard"+(active?" active":"")+"' data-cid='"+v.id+"'>"+
+      "<canvas width='100' height='50' data-model='"+v.model+"' data-col='"+v.col+"'></canvas>"+
+      "<div class='cinfo'><div class='cname'>"+esc(m.n)+(active?" <span style='color:var(--ok);font-size:11px'>— за рулём</span>":"")+"</div>"+
+      "<div class='cstats'><span>Топливо: <b>"+Math.round(v.fuel)+"/80</b></span><span>Скорость: <b>"+m.spd+"</b></span></div></div>"+
+      "<div class='cactions'>"+
+        "<button class='primary' data-act='locate' data-cid='"+v.id+"'>На карте</button>"+
+        "<button data-act='repair' data-cid='"+v.id+"'>Ремонт 300 ₽</button>"+
+        "<button class='danger' data-act='sell' data-cid='"+v.id+"'>Продать</button>"+
+      "</div></div>";
+  });
+  html+="</div><div class='row'><button class='go' data-a='x' style='width:100%'>Закрыть</button></div>";
+  openDlg(html);
+  setTimeout(()=>{
+    document.querySelectorAll("#garageList canvas").forEach(cv=>{
+      const c2=cv.getContext("2d"); c2.fillStyle="#0a0d14"; c2.fillRect(0,0,cv.width,cv.height);
+      drawCarPreview(c2, +cv.dataset.model, cv.width, cv.height, cv.dataset.col);
+    });
+  },30);
+}
+document.addEventListener("click", function(ev){
+  const b=ev.target.closest("[data-act]"); if(!b) return;
+  const act=b.dataset.act, cid=b.dataset.cid; const me=S.me;
+  const veh=S.vehs.find(v=>v.id===cid); if(!veh) return;
+  if(act==="locate"){ S.waypoint={x:veh.x,y:veh.y}; toast("Метка: "+CARS[veh.model].n); document.getElementById("dlg").classList.remove("on"); return; }
+  if(act==="repair"){
+    if(me.money<300){ toast("Нужно 300 ₽"); return; }
+    me.money-=300; veh.fuel=80; saveSoon(); toast("Машина отремонтирована"); openGarageApp(); return;
+  }
+  if(act==="sell"){
+    const m=CARS[veh.model]; const price=Math.floor(m.price*0.6);
+    if(!confirm("Продать "+m.n+" за "+moneyStr(price)+"?")) return;
+    me.money+=price;
+    if(me.veh===veh) me.veh=null;
+    S.vehs=S.vehs.filter(v=>v.id!==cid);
+    me.myCars=(me.myCars||[]).filter(id=>id!==cid);
+    saveSoon(); toast("Продано: "+m.n); openGarageApp(); return;
+  }
+});
+
+/* ИНВЕНТАРЬ */
+function renderInventory(){
+  const e=document.getElementById("inv"); const me=S.me;
+  if(!me.inv) me.inv=[];
+  let html="<h2>🎒 Карманы</h2>";
+  if(me.inv.length===0){ html+="<p style='color:var(--dim);padding:10px;text-align:center'>Инвентарь пуст</p>"; }
+  else {
+    me.inv.forEach(function(it,i){
+      let name="Предмет",qty=1;
+      if(typeof it==="string") name=it;
+      else if(typeof it==="number") qty=it;
+      else if(it && typeof it==="object"){ name=it.n||it.name||"Предмет"; qty=Math.max(1,Math.floor(+it.q||+it.qty||1)); }
+      html+="<div class='invItem'><span class='invName'>"+esc(name)+"<span class='invQty'>×"+qty+"</span></span>"+
+        "<span class='invBtns'><button data-i='"+i+"' data-act='use'>Использовать</button>"+
+        "<button class='drop' data-i='"+i+"' data-act='drop'>Выбросить</button></span></div>";
+    });
+  }
+  const hasSellable=me.inv.some(it=>{
+    const name=(it&&typeof it==="object")?(it.n||""):(typeof it==="string"?it:"");
+    return MARKET_ITEMS.includes(name);
+  });
+  if(hasSellable) html+="<div class='row' style='margin-top:10px'><button class='go' id='invsell' style='width:100%;background:var(--gold);color:#000;padding:12px'>💰 Продать все ресурсы</button></div>";
+  html+="<div class='row'><button class='go' id='invx' style='width:100%;padding:12px'>Закрыть</button></div>";
+  e.innerHTML=html;
+}
+function toggleInv(){
+  const e=document.getElementById("inv");
+  if(e.classList.contains("on")){ e.classList.remove("on"); return; }
+  closePanels(); renderInventory(); e.classList.add("on");
+}
+document.getElementById("inv").addEventListener("click", function(ev){
+  const me=S.me; if(!me||!me.inv) return;
+  if(ev.target.id==="invx"){ document.getElementById("inv").classList.remove("on"); return; }
+  if(ev.target.id==="invsell"){
+    let total=0; const sold=[];
+    me.inv=me.inv.filter(function(it){
+      const name=(it&&typeof it==="object")?(it.n||""):(typeof it==="string"?it:"");
+      const qty=(it&&typeof it==="object")?(+it.q||1):1;
+      if(MARKET_ITEMS.includes(name)){
+        const price=MARKET.prices[name]||MARKET_BASE[name];
+        total+=price*qty; sold.push(name+" x"+qty); marketSell(name,qty);
+        return false;
+      }
+      return true;
+    });
+    if(total>0){ me.money+=total; saveSoon(); toast("Продано: "+sold.join(", ")+" · "+moneyStr(total)); renderInventory(); }
+    else toast("Нет ресурсов");
+    return;
+  }
+  const b=ev.target.closest("[data-i]"); if(!b) return;
+  const idx=+b.dataset.i; const it=me.inv[idx]; if(!it){ renderInventory(); return; }
+  let name, qty;
+  if(typeof it==="string"){ name=it; qty=1; }
+  else if(typeof it==="number"){ name="Предмет"; qty=it; }
+  else { name=it.n||"Предмет"; qty=+it.q||1; }
+  const act=b.dataset.act||"use";
+  if(act==="drop"){ me.inv.splice(idx,1); toast("Выброшено: "+name); saveSoon(); renderInventory(); return; }
+  if(FOOD_ITEMS[name]!==undefined){ me.hunger=Math.min(100,me.hunger+FOOD_ITEMS[name]); take(name,1); toast("Съедено: "+name); }
+  else if(name==="Аптечка"){ me.hp=Math.min(100,me.hp+55); take(name,1); toast("Лечение +55 HP"); }
+  else if(name==="Ремкомплект"){ if(me.veh){ me.veh.fuel=Math.min(80,me.veh.fuel+10); take(name,1); toast("Подкрутили"); } else toast("Нужно быть в машине"); }
+  else if(name==="Права"){ toast("Ваши права при вас"); }
+  else if(name==="Телефон"){ toast("Телефон уже в руках"); }
+  else { toast(name+" — ресурс, продайте на работе"); }
+  saveSoon(); renderInventory();
+});
+
+/* ТЕЛЕФОН */
+function togglePhone(){
+  const e=document.getElementById("phone");
+  if(e.classList.contains("on")){ e.classList.remove("on"); return; }
+  closePanels();
+  e.innerHTML="<h4>📱 Телефон</h4>"+
+    "<button data-app='gps'>📍 Навигация (GPS)</button>"+
+    "<button data-app='inv'>🎒 Инвентарь</button>"+
+    "<button data-app='garage'>🚗 Мои авто</button>"+
+    "<button data-app='fam'>👥 Семья</button>"+
+    "<button data-app='bank'>🏦 Банк</button>"+
+    "<button data-app='market'>📈 Биржа</button>"+
+    "<button data-app='stats'>📊 Статистика</button>"+
+    "<button data-app='help'>❓ Помощь</button>"+
+    "<button id='phx'>Закрыть</button>";
+  e.classList.add("on");
+}
+document.getElementById("phone").addEventListener("click", function(ev){
+  if(ev.target.id==="phx"){ document.getElementById("phone").classList.remove("on"); return; }
+  var app=ev.target.getAttribute("data-app");
+  if(ev.target.id==="phg"){ togglePhone(); return; }
+  if(app==="gps"){
+    var e2=document.getElementById("phone");
+    e2.innerHTML="<h4>📍 Навигация</h4>"+S.places.map(p=>"<button data-g='"+p.id+"'>"+p.n+"</button>").join("")+"<button id='phg'>Назад</button>";
+    return;
+  }
+  if(app==="inv"){ document.getElementById("phone").classList.remove("on"); toggleInv(); return; }
+  if(app==="garage"){ openGarageApp(); return; }
+  if(app==="fam"){
+    document.getElementById("phone").classList.remove("on");
+    if(S.me.family){ var fam=S.me.family; var html="<h2>👥 Семья: "+esc(fam.name)+"</h2>";
+      fam.members.forEach(m=>{ html+="<div class='famMember'><span>"+esc(m.name)+"</span><span class='famRole'>"+m.role+"</span></div>"; });
+      html+="<div class='row'><button class='go' data-a='faminvite'>Пригласить</button></div><div class='row'><button class='go' data-a='famleave'>Покинуть</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>"; openDlg(html);
+    } else openDlg("<h2>👥 Семья</h2><p>У вас нет семьи. Создайте в Правительстве.</p><div class='row'><button class='go' data-a='x'>Закрыть</button></div>");
+    return;
+  }
+  if(app==="bank"){ document.getElementById("phone").classList.remove("on");
+    openDlg("<h2>🏦 Банк</h2><p>Наличные: "+moneyStr(S.me.money)+" · счёт: "+moneyStr(S.me.bank)+"</p><div class='row'><span>Положить 1000 ₽</span><button class='go' data-a='dep'>OK</button></div><div class='row'><span>Снять 1000 ₽</span><button class='go' data-a='wd'>OK</button></div><div class='row'><button class='go' data-a='x'>Закрыть</button></div>");
+    return;
+  }
+  if(app==="market"){
+    document.getElementById("phone").classList.remove("on");
+    let html="<h2>📈 Биржа</h2><p style='font-size:11px;color:var(--dim)'>Цены меняются каждые 2 минуты.</p>";
+    MARKET_ITEMS.forEach(name=>{
+      const p=MARKET.prices[name]; const base=MARKET_BASE[name];
+      const diff=p-base; const pct=Math.round(diff/base*100);
+      const cls=diff>0?"up":diff<0?"down":""; const sign=diff>0?"+":"";
+      html+="<div class='marketRow'><span class='mname'><b>"+name+"</b></span><span><span class='mprice'>"+p+" ₽</span><span class='mdelta "+cls+"'>"+sign+pct+"%</span></span></div>";
+    });
+    html+="<div class='row'><button class='go' data-a='x'>Закрыть</button></div>"; openDlg(html); return;
+  }
+  if(app==="stats"){
+    document.getElementById("phone").classList.remove("on");
+    var me=S.me;
+    openDlg("<h2>📊 Статистика</h2>"+
+      "<div class='row'><span>Имя</span><b>"+esc(me.name)+"</b></div>"+
+      "<div class='row'><span>Деньги</span><b>"+moneyStr(me.money)+"</b></div>"+
+      "<div class='row'><span>Счёт в банке</span><b>"+moneyStr(me.bank)+"</b></div>"+
+      "<div class='row'><span>Здоровье</span><b>"+Math.round(me.hp)+"/100</b></div>"+
+      "<div class='row'><span>Голод</span><b>"+Math.round(me.hunger)+"/100</b></div>"+
+      "<div class='row'><span>Работа</span><b>"+(me.jobId||"Безработный")+"</b></div>"+
+      "<div class='row'><span>Семья</span><b>"+(me.family?me.family.name:"Нет")+"</b></div>"+
+      "<div class='row'><span>Машин</span><b>"+((me.myCars||[]).length)+"</b></div>"+
+      "<div class='row'><button class='go' data-a='x'>Закрыть</button></div>");
+    return;
+  }
+  if(app==="help"){ document.getElementById("phone").classList.remove("on"); document.getElementById("mdHelp").classList.add("on"); return; }
+  var id=ev.target.getAttribute("data-g");
+  if(id){ var p=S.places.find(x=>x.id===id); if(p){ S.waypoint=p; toast("Метка: "+p.n); document.getElementById("phone").classList.remove("on"); } }
+});
+
+/* ДОМ */
+function enterHouse(){ if(S.insideHouse) return; S.insideHouse=true;
+  document.getElementById("houseOverlay").classList.add("on");
+  document.getElementById("houseTitle").textContent="🏠 Ваш дом";
+  document.getElementById("houseSub").textContent="ESC — выйти";
+  houseRaf=requestAnimationFrame(houseLoop);
+}
+function exitHouse(){ if(!S.insideHouse) return; S.insideHouse=false;
+  document.getElementById("houseOverlay").classList.remove("on");
+  if(houseRaf) cancelAnimationFrame(houseRaf); houseRaf=0;
+}
+function resizeHouseCanvas(){
+  const dpr=Math.min(1.5,window.devicePixelRatio||1);
+  const w=houseCanvas.clientWidth||innerWidth, h=houseCanvas.clientHeight||innerHeight;
+  houseCanvas.width=w*dpr; houseCanvas.height=h*dpr;
+  hctx.setTransform(dpr,0,0,dpr,0,0);
+}
+function houseLoop(ts){ if(!S.insideHouse) return; if(houseCanvas.width===0) resizeHouseCanvas(); drawHouseInterior(ts||performance.now()); houseRaf=requestAnimationFrame(houseLoop); }
+function drawHouseInterior(ts){
+  const w=houseCanvas.clientWidth||innerWidth, h=houseCanvas.clientHeight||innerHeight;
+  hctx.fillStyle="#1a1410"; hctx.fillRect(0,0,w,h);
+  hctx.fillStyle="#2a2018"; hctx.fillRect(0,0,w,h*0.15);
+  const floorY=h*0.62;
+  hctx.fillStyle="#5a3a20"; hctx.fillRect(0,floorY,w,h-floorY);
+  for(let i=0;i<40;i++){ hctx.strokeStyle="rgba(0,0,0,0.15)"; hctx.beginPath(); hctx.moveTo(0,floorY+i*12); hctx.lineTo(w,floorY+i*12); hctx.stroke(); }
+  hctx.fillStyle="#3a2a1e"; hctx.fillRect(0,h*0.15,w,floorY-h*0.15);
+  for(let i=0;i<60;i++){ hctx.fillStyle=(i%2===0)?"#3e2c1f":"#372618"; hctx.fillRect(i*(w/60),h*0.15,w/60,floorY-h*0.15); }
+  const winX=w*0.5-90, winY=h*0.25, winW=180, winH=130;
+  const grad=hctx.createLinearGradient(winX,winY,winX,winY+winH);
+  grad.addColorStop(0,"#0d1622"); grad.addColorStop(1,"#1a2030");
+  hctx.fillStyle=grad; hctx.fillRect(winX,winY,winW,winH);
+  for(let i=0;i<20;i++){ hctx.fillStyle="rgba(255,255,255,"+(0.3+Math.random()*0.5)+")"; hctx.fillRect(winX+Math.random()*winW,winY+Math.random()*winH*0.6,2,2); }
+  hctx.fillStyle="#e8e2d4"; hctx.beginPath(); hctx.arc(winX+winW*0.75,winY+winH*0.3,16,0,Math.PI*2); hctx.fill();
+  hctx.strokeStyle="#5a3a20"; hctx.lineWidth=6; hctx.strokeRect(winX,winY,winW,winH);
+  hctx.beginPath(); hctx.moveTo(winX+winW/2,winY); hctx.lineTo(winX+winW/2,winY+winH); hctx.moveTo(winX,winY+winH/2); hctx.lineTo(winX+winW,winY+winH/2); hctx.stroke();
+  hctx.fillStyle="#7a2030"; hctx.beginPath(); hctx.ellipse(w/2,floorY+80,200,50,0,0,Math.PI*2); hctx.fill();
+  hctx.fillStyle="#9a3040"; hctx.beginPath(); hctx.ellipse(w/2,floorY+80,170,38,0,0,Math.PI*2); hctx.fill();
+  const sofaX=w*0.08, sofaY=floorY-40;
+  hctx.fillStyle="#5a2a3a"; hctx.fillRect(sofaX,sofaY,220,90);
+  hctx.fillStyle="#7a3a4a"; hctx.fillRect(sofaX+8,sofaY+8,204,40);
+  hctx.fillStyle="#3a1a28"; hctx.fillRect(sofaX,sofaY+90,220,10);
+  const tblX=w*0.42, tblY=floorY-10;
+  hctx.fillStyle="#3a2018"; hctx.fillRect(tblX,tblY,180,14);
+  hctx.fillStyle="#2a1610"; hctx.fillRect(tblX+10,tblY+14,8,50); hctx.fillRect(tblX+162,tblY+14,8,50);
+  hctx.fillStyle="#c9a56a"; hctx.beginPath(); hctx.moveTo(tblX+70,tblY-40); hctx.lineTo(tblX+110,tblY-40); hctx.lineTo(tblX+100,tblY-5); hctx.lineTo(tblX+80,tblY-5); hctx.closePath(); hctx.fill();
+  const lampGrad=hctx.createRadialGradient(tblX+90,tblY-40,10,tblX+90,tblY-40,220);
+  lampGrad.addColorStop(0,"rgba(255,220,140,0.35)"); lampGrad.addColorStop(1,"rgba(255,220,140,0)");
+  hctx.fillStyle=lampGrad; hctx.fillRect(0,0,w,h);
+  const tvX=w*0.78, tvY=h*0.3;
+  hctx.fillStyle="#111"; hctx.fillRect(tvX,tvY,200,120);
+  hctx.fillStyle="#0a2a20"; hctx.fillRect(tvX+6,tvY+6,188,108);
+  const t=(ts||performance.now())*0.001;
+  for(let i=0;i<30;i++){
+    const bx=tvX+6+((i*41+t*60)%180), by=tvY+6+((i*71+t*40)%100);
+    hctx.fillStyle="rgba(80,"+(150+Math.floor(Math.sin(i+t)*50))+",150,0.25)";
+    hctx.fillRect(bx,by,8,4);
+  }
+  hctx.strokeStyle="#333"; hctx.lineWidth=3; hctx.strokeRect(tvX,tvY,200,120);
+  hctx.fillStyle="#3a2018"; hctx.fillRect(tvX-20,tvY+130,240,60);
+}
+document.getElementById("houseExit").onclick=exitHouse;
+document.getElementById("deathOk").onclick=closeDeathScreen;
+
+/* МЕНЮ */
+function toggleMenu(){
+  const e=document.getElementById("menu");
+  if(e.classList.contains("on")){ e.classList.remove("on"); S.paused=false; return; }
+  closePanels(); S.paused=true;
+  e.innerHTML="<h2>Пауза</h2><p>"+S.me.name+" · "+(S.servers[S.sid]?S.servers[S.sid].name:"")+"</p><div class='row'><button class='go' id='cont'>Продолжить</button></div><div class='row'><button class='go red' id='leave'>Выйти на лаунчер</button></div>";
+  e.classList.add("on");
+}
+document.getElementById("menu").addEventListener("click", ev=>{
+  if(ev.target.id==="cont"){ document.getElementById("menu").classList.remove("on"); S.paused=false; }
+  if(ev.target.id==="leave"){ leave(); }
+});
+
+/* ЧАТ */
+function pushChat(html, local){
+  S.chat.push(html); if(S.chat.length>40) S.chat.shift();
+  document.getElementById("chat").innerHTML=S.chat.slice(-12).join("");
+  if(local) sendChat(html);
+}
+async function sendChat(text){ if(!S.sid) return; try{ await fb("rooms/"+S.sid+"/chat/"+Date.now()+"_"+uid,"PUT",{n:S.me.name,t:text,at:Date.now()}); }catch(e){} }
+function handleChat(raw){
+  const me=S.me, m=raw.trim(); if(!m) return;
+  if(m.startsWith("/me ")){ pushChat("<div style='color:#c9a56a'>* "+me.name+" "+esc(m.slice(4))+"</div>", true); return; }
+  if(m.startsWith("/do ")){ pushChat("<div style='color:#9ab'>* "+esc(m.slice(4))+" (("+me.name+"))</div>", true); return; }
+  if(m.startsWith("/gps ")){
+    const q=m.slice(5).toLowerCase(); const p=S.places.find(x=>x.n.toLowerCase().includes(q));
+    if(p){ S.waypoint=p; toast("Метка: "+p.n); } else toast("Не знаю это место");
+    return;
+  }
+  if(m.startsWith("/pay ")){
+    const parts=m.split(/\s+/), who=parts[1], amt=+parts[2];
+    if(!amt || amt<1 || me.money<amt){ toast("Нет денег"); return; }
+    let tgt=null; for(const id in S.others){ if(S.others[id].n===who || id===who) tgt=S.others[id]; }
+    if(!tgt){ toast("Рядом нет такого игрока"); return; }
+    if(Math.hypot(tgt.x-me.x,tgt.y-me.y)>80){ toast("Слишком далеко"); return; }
+    me.money-=amt; saveSoon();
+    fb("rooms/"+S.sid+"/pay/"+Date.now(),"PUT",{from:uid,to:tgt.id,amt,at:Date.now()}).catch(()=>{});
+    pushChat("<div style='color:#b6e3b0'>"+me.name+" передал "+tgt.n+" "+moneyStr(amt)+"</div>", true);
+    return;
+  }
+  pushChat("<div><b>"+esc(me.name)+"</b>: "+esc(m)+"</div>", true);
+}
+
+/* СЕТЬ */
+function saveSoon(){ S.dirty=true; }
+async function saveAccount(){
+  if(!S.sid || !S.me) return;
+  const me=S.me;
+  try{
+    await fb("rooms/"+S.sid+"/acc/"+uid,"PUT",{
+      name:me.name, money:me.money|0, bank:me.bank|0, skin:me.skin,
+      x:me.x|0, y:me.y|0, hp:me.hp|0, hunger:me.hunger|0,
+      lic:!!me.lic, house:me.house||null, ownCar:me.ownCar,
+      myCars:me.myCars||[], inv:me.inv, family:me.family||null, t:Date.now()
+    });
+  }catch(e){ toast("Облако не приняло сохранение"); }
+}
+async function pulse(){
+  if(!S.sid || !S.me) return; const me=S.me;
+  try{ await fb("rooms/"+S.sid+"/live/"+uid,"PUT",{n:me.name,x:me.x|0,y:me.y|0,a:+me.a.toFixed(2),s:me.skin,v:me.veh?me.veh.model:-1,hp:me.hp|0,t:Date.now()}); }catch(e){}
+}
+async function poll(){
+  if(!S.sid) return;
+  try{
+    const live = await fb("rooms/"+S.sid+"/live");
+    const now=Date.now(), map={};
+    if(live){
+      for(const id in live){
+        if(id===uid) continue;
+        const o=live[id]; if(!o || now-(o.t||0)>10000) continue;
+        const prev=S.others[id];
+        map[id]={id,n:o.n,x:o.x,y:o.y,a:o.a,s:o.s,v:o.v,hp:o.hp,dx:prev?prev.dx:o.x,dy:prev?prev.dy:o.y};
+      }
+    }
+    S.others=map;
+    const n=Object.keys(live||{}).length;
+    fb("servers/"+S.sid,"PATCH",{online:n,updated:now}).catch(()=>{});
+    const chat = await fb("rooms/"+S.sid+"/chat");
+    if(chat){
+      const keys=Object.keys(chat).sort();
+      for(const k of keys.slice(-12)){
+        const c=chat[k]; if(!c||c.n===S.me.name) continue;
+        if(!poll._seen) poll._seen=new Set();
+        if(poll._seen.has(k)) continue; poll._seen.add(k);
+        S.chat.push("<div>"+c.t+"</div>");
+      }
+      document.getElementById("chat").innerHTML=S.chat.slice(-12).join("");
+    }
+    const pays = await fb("rooms/"+S.sid+"/pay");
+    if(pays){
+      for(const k in pays){
+        const p=pays[k]; if(!p||p.to!==uid) continue;
+        if(!poll._pay) poll._pay=new Set();
+        if(poll._pay.has(k)) continue; poll._pay.add(k);
+        S.me.money+=+p.amt; saveSoon(); toast("Вам перевели "+moneyStr(p.amt));
+      }
+    }
+  }catch(e){}
+}
+async function join(){
+  unlockAudio();
+  const nick=document.getElementById("nick").value.trim().replace(/[^\wа-яА-ЯёЁ \-]/g,"").slice(0,16);
+  if(nick.length<2){ toast("Ник от 2 символов"); return; }
+  if(!S.sel){ toast("Сначала выберите сервер"); openServerScreen(); return; }
+  S.nick=nick; localStorage.setItem("mr_nick",nick);
+  localStorage.setItem("mr_skin",""+S.skin);
+  S.sid=S.sel;
+  let acc=null;
+  try{ acc=await fb("rooms/"+S.sid+"/acc/"+uid); }catch(e){}
+
+  const preferredSpawn = (acc && acc.house)? acc.house : S.places.find(p=>p.id==="spawn");
+  const safeSpawn = findSafeSpawn(preferredSpawn);
+
+  S.me = {
+    id:uid, name:nick, skin:S.skin,
+    x:(acc&&acc.x)||safeSpawn.x, y:(acc&&acc.y)||safeSpawn.y, a:0,
+    hp:(acc&&acc.hp)||100, armor:0, hunger:(acc&&acc.hunger)||80, stam:100,
+    money:(acc&&typeof acc.money==="number")?acc.money:4850,
+    bank:(acc&&acc.bank)||0, wanted:0, veh:null, dead:false,
+    inv:(function(){
+      var rawInv=(acc&&Array.isArray(acc.inv))?acc.inv:[];
+      if(rawInv.length===0) return [{n:"Телефон",q:1}];
+      return rawInv.map(item=>{
+        if(typeof item==="string") return {n:item,q:1};
+        if(typeof item==="number") return {n:"Предмет",q:item};
+        if(item && typeof item==="object") return {n:item.n||item.name||"Неизвестный предмет",q:item.q||1};
+        return null;
+      }).filter(Boolean);
+    })(),
+    lic:!!(acc&&acc.lic), house:acc&&acc.house, ownCar:acc&&acc.ownCar,
+    myCars:(acc&&Array.isArray(acc.myCars))?acc.myCars:[],
+    jobId:null, family:(acc&&acc.family)||null
+  };
+
+  if (blocked(S.me.x, S.me.y, 12)){
+    const forced = findSafeSpawn(S.me);
+    S.me.x = forced.x; S.me.y = forced.y;
+  }
+
+  S.me.myCars = S.me.myCars.filter(id=>S.vehs.some(v=>v.id===id));
+  document.getElementById("home").classList.remove("on");
+  document.getElementById("stage").classList.add("on");
+  document.getElementById("bRun").classList.add("on");
+  S.running=true; S.paused=false; lastTs=performance.now(); resize();
+  pushChat("<div style='color:#8b93a1'>Добро пожаловать в Новолунск, "+esc(nick)+".</div>", false);
+  saveAccount(); pulse();
+  requestAnimationFrame(loop);
+}
+async function leave(){
+  S.running=false; S.paused=false;
+  try{ if(S.sid) await fb("rooms/"+S.sid+"/live/"+uid,"DELETE"); }catch(e){}
+  await saveAccount();
+  closePanels();
+  document.getElementById("stage").classList.remove("on");
+  document.getElementById("bRun").classList.remove("on");
+  document.getElementById("bBrake").classList.remove("on");
+  document.getElementById("home").classList.add("on");
+  loadServers();
+}
+
+/* ЦИКЛ */
+function loop(ts){
+  if(!S.running) return;
+  const dt=Math.min(0.033,(ts-lastTs)/1000); lastTs=ts;
+  step(dt);
+  if(!S.insideHouse) draw();
+  const now=performance.now();
+  if(now-S.lastPulse>900){ S.lastPulse=now; pulse(); if(S.dirty && now-S.lastSave>1500){ S.lastSave=now; S.dirty=false; saveAccount(); } }
+  if(now-S.lastPoll>1100){ S.lastPoll=now; poll(); }
+  requestAnimationFrame(loop);
+}
+window.addEventListener("keydown", e=>{
+  const ae = document.activeElement;
+  const isTyping = ae && (ae.tagName === "INPUT" || ae.tagName === "TEXTAREA" || ae.isContentEditable);
+  if (isTyping) {
+    if (e.code === "Enter" && ae.id === "cinput"){
+      e.preventDefault();
+      handleChat(ae.value);
+      ae.value = ""; ae.style.display = "none"; view.focus();
+    }
+    if (e.code === "Escape" && ae.id === "cinput"){
+      e.preventDefault();
+      ae.value = ""; ae.style.display = "none"; view.focus();
+    }
+    return;
+  }
+  S.keys[e.code]=true;
+  if(!S.running) return;
+  if(S.insideHouse){ if(e.code==="Escape"){ e.preventDefault(); exitHouse(); } return; }
+  if(S.me && S.me.dead) return;
+  if(e.code==="KeyF"){ e.preventDefault(); if(S.me.veh) exitCar(); else { const t=interactTarget(); if(t&&t.v) enterCar(t.v); } }
+  if(e.code==="KeyE"){ e.preventDefault(); doInteract(); }
+  if(e.code==="KeyI") toggleInv();
+  if(e.code==="KeyP") togglePhone();
+  if(e.code==="Escape") toggleMenu();
+  if(e.code==="KeyT"){ e.preventDefault(); const i=document.getElementById("cinput"); i.style.display="block"; i.focus(); }
+});
+window.addEventListener("keyup", e=> S.keys[e.code]=false);
+document.getElementById("bF").ontouchstart = document.getElementById("bF").onclick = e=>{ e.preventDefault(); if(S.me.dead) return; if(S.me.veh) exitCar(); else { const t=interactTarget(); if(t&&t.v) enterCar(t.v);} };
+document.getElementById("bE").ontouchstart = document.getElementById("bE").onclick = e=>{ e.preventDefault(); if(S.me.dead) return; doInteract(); };
+document.getElementById("bRun").ontouchstart = document.getElementById("bRun").onmousedown = function(e){ e.preventDefault(); S.keys["ShiftLeft"]=true; document.getElementById("bRun").classList.add("active"); };
+document.getElementById("bRun").ontouchend = document.getElementById("bRun").onmouseup = function(e){ e.preventDefault(); S.keys["ShiftLeft"]=false; document.getElementById("bRun").classList.remove("active"); };
+document.getElementById("bBrake").ontouchstart = document.getElementById("bBrake").onmousedown = function(e){ e.preventDefault(); S.keys["Space"]=true; document.getElementById("bBrake").classList.add("active"); };
+document.getElementById("bBrake").ontouchend = document.getElementById("bBrake").onmouseup = function(e){ e.preventDefault(); S.keys["Space"]=false; document.getElementById("bBrake").classList.remove("active"); };
+document.getElementById("bI").onclick = toggleInv;
+document.getElementById("bP").onclick = togglePhone;
+document.getElementById("bT").onclick = ()=>{ const i=document.getElementById("cinput"); i.style.display="block"; i.focus(); };
+document.getElementById("bM").onclick = toggleMenu;
+
+/* МИНИ-ИГРЫ */
+var mgState = null;
+var MG_THEMES = {
+  lumber:{title:"ЛЕСОПИЛКА",color:"#4a8a3a",shape:"triangle",reward:850,item:"Доски",time:15,count:5},
+  mine:{title:"ШАХТА",color:"#8a6a3a",shape:"diamond",reward:1200,item:"Руда",time:18,count:5},
+  factory:{title:"ЗАВОД",color:"#4a4a6a",shape:"square",reward:950,item:"Деталь",time:15,count:5},
+  farm:{title:"ФЕРМА",color:"#6a9a4a",shape:"circle",reward:700,item:"Картофель",time:15,count:5},
+  fish:{title:"РЫБНЫЙ ПРИЧАЛ",color:"#3a7aaa",shape:"fish",reward:650,item:"Рыба",time:18,count:5},
+  repair:{title:"СТО",color:"#aa6a3a",shape:"wrench",reward:950,item:null,time:15,count:5},
+  port:{title:"ПОРТ",color:"#4a6a8a",shape:"box",reward:1100,item:null,time:18,count:5},
+  media:{title:"ЛУНА-ТВ",color:"#aa3a5a",shape:"star",reward:800,item:null,time:15,count:5},
+  mafia:{title:"КОНТРАБАНДА",color:"#8a2a2a",shape:"diamond",reward:2000,item:null,time:20,count:6}
+};
+function startMiniGame(type){
+  var theme=MG_THEMES[type];
+  if(!theme){ toast("Мини-игра недоступна"); return; }
+  var overlay=document.getElementById("mgOverlay");
+  var canvas=document.getElementById("mgCanvas");
+  var ctx2=canvas.getContext("2d");
+  var maxW=Math.min(window.innerWidth-40,600);
+  var maxH=Math.min(window.innerHeight-200,400);
+  canvas.width=maxW; canvas.height=maxH;
+  document.getElementById("mgTitle").textContent=theme.title;
+  document.getElementById("mgScore").textContent="0";
+  document.getElementById("mgTime").textContent=theme.time;
+  document.getElementById("mgResult").classList.remove("on");
+  document.getElementById("mgExit").style.display="block";
+  var crystals=[]; var score=0; var timeLeft=theme.time;
+  var CW=canvas.width, CH=canvas.height;
+  function spawnCrystal(){ var margin=40; crystals.push({x:margin+Math.random()*(CW-margin*2), y:margin+Math.random()*(CH-margin*2), r:18+Math.random()*10, pulse:0}); }
+  for(var i=0; i<theme.count; i++) spawnCrystal();
+  overlay.classList.add("on"); S.paused=true; beep(440,0.1);
+  var timer=setInterval(function(){
+    timeLeft-=0.1;
+    document.getElementById("mgTime").textContent=Math.max(0,Math.ceil(timeLeft));
+    if(timeLeft<=0){ clearInterval(timer); endMiniGame(); }
+  },100);
+  function endMiniGame(){
+    mgState=null; clearInterval(timer);
+    var totalReward=score*theme.reward;
+    if(theme.item && score>0) give(theme.item, Math.max(1,Math.floor(score/3)));
+    if(score>0){ S.me.money+=totalReward; saveSoon(); }
+    document.getElementById("mgResTitle").textContent="Смена окончена!";
+    document.getElementById("mgResText").textContent="Собрано: "+score+" · Награда: "+moneyStr(totalReward)+(theme.item?" · "+theme.item+": "+Math.max(1,Math.floor(score/3))+" шт":"");
+    document.getElementById("mgResult").classList.add("on");
+    document.getElementById("mgExit").style.display="none";
+    beep(660,0.15);
+  }
+  function drawCrystal(c){
+    var pulse=Math.sin(c.pulse)*3; var size=c.r+pulse;
+    ctx2.save(); ctx2.translate(c.x,c.y);
+    var grad=ctx2.createRadialGradient(0,0,0,0,0,size*1.8);
+    grad.addColorStop(0,theme.color+"cc"); grad.addColorStop(0.5,theme.color+"44"); grad.addColorStop(1,theme.color+"00");
+    ctx2.fillStyle=grad; ctx2.beginPath(); ctx2.arc(0,0,size*1.8,0,Math.PI*2); ctx2.fill();
+    ctx2.fillStyle=theme.color; ctx2.strokeStyle="#ffffff88"; ctx2.lineWidth=2;
+    if(theme.shape==="diamond"){ ctx2.beginPath(); ctx2.moveTo(0,-size); ctx2.lineTo(size,0); ctx2.lineTo(0,size); ctx2.lineTo(-size,0); ctx2.closePath(); ctx2.fill(); ctx2.stroke(); }
+    else if(theme.shape==="triangle"){ ctx2.beginPath(); ctx2.moveTo(0,-size); ctx2.lineTo(size*0.866,size*0.5); ctx2.lineTo(-size*0.866,size*0.5); ctx2.closePath(); ctx2.fill(); ctx2.stroke(); }
+    else if(theme.shape==="square"){ ctx2.fillRect(-size*0.8,-size*0.8,size*1.6,size*1.6); ctx2.strokeRect(-size*0.8,-size*0.8,size*1.6,size*1.6); }
+    else if(theme.shape==="star"){ ctx2.beginPath(); for(var sp=0;sp<10;sp++){ var ang=(sp/10)*Math.PI*2-Math.PI/2; var rad=sp%2===0?size:size*0.45; var px=Math.cos(ang)*rad, py=Math.sin(ang)*rad; if(sp===0) ctx2.moveTo(px,py); else ctx2.lineTo(px,py); } ctx2.closePath(); ctx2.fill(); ctx2.stroke(); }
+    else if(theme.shape==="fish"){ ctx2.beginPath(); ctx2.ellipse(0,0,size,size*0.6,0,0,Math.PI*2); ctx2.fill(); ctx2.stroke(); ctx2.beginPath(); ctx2.moveTo(size*0.7,0); ctx2.lineTo(size*1.3,-size*0.4); ctx2.lineTo(size*1.3,size*0.4); ctx2.closePath(); ctx2.fill(); }
+    else if(theme.shape==="wrench"){ ctx2.beginPath(); ctx2.arc(-size*0.3,-size*0.3,size*0.4,0,Math.PI*2); ctx2.arc(size*0.3,size*0.3,size*0.4,0,Math.PI*2); ctx2.fill(); ctx2.stroke(); }
+    else if(theme.shape==="box"){ ctx2.fillRect(-size*0.7,-size*0.6,size*1.4,size*1.2); ctx2.strokeRect(-size*0.7,-size*0.6,size*1.4,size*1.2); ctx2.beginPath(); ctx2.moveTo(0,-size*0.6); ctx2.lineTo(0,size*0.6); ctx2.stroke(); }
+    else { ctx2.beginPath(); ctx2.arc(0,0,size,0,Math.PI*2); ctx2.fill(); ctx2.stroke(); }
+    ctx2.restore();
+  }
+  function render(){
+    if(!overlay.classList.contains("on")) return;
+    ctx2.fillStyle="#07090e"; ctx2.fillRect(0,0,CW,CH);
+    ctx2.strokeStyle="#ffffff08"; ctx2.lineWidth=1;
+    for(var gx=0; gx<CW; gx+=40){ ctx2.beginPath(); ctx2.moveTo(gx,0); ctx2.lineTo(gx,CH); ctx2.stroke(); }
+    for(var gy=0; gy<CH; gy+=40){ ctx2.beginPath(); ctx2.moveTo(0,gy); ctx2.lineTo(CW,gy); ctx2.stroke(); }
+    for(var i=0; i<crystals.length; i++){ crystals[i].pulse+=0.06; drawCrystal(crystals[i]); }
+    requestAnimationFrame(render);
+  }
+  render();
+  function onMgClick(e){
+    e.preventDefault();
+    var rect=canvas.getBoundingClientRect();
+    var cx,cy;
+    if(e.touches && e.touches[0]){ cx=e.touches[0].clientX-rect.left; cy=e.touches[0].clientY-rect.top; }
+    else { cx=e.clientX-rect.left; cy=e.clientY-rect.top; }
+    for(var i=crystals.length-1; i>=0; i--){
+      var c=crystals[i];
+      if(Math.hypot(cx-c.x,cy-c.y)<c.r+10){
+        score++; document.getElementById("mgScore").textContent=score;
+        beep(600+score*20,0.05);
+        c.x=40+Math.random()*(CW-80); c.y=40+Math.random()*(CH-80); c.r=16+Math.random()*12;
+        if(score%5===0 && crystals.length<theme.count+3) spawnCrystal();
+        break;
+      }
+    }
+  }
+  canvas.ontouchstart=onMgClick; canvas.onmousedown=onMgClick;
+  document.getElementById("mgExit").onclick=function(){ clearInterval(timer); overlay.classList.remove("on"); S.paused=false; canvas.ontouchstart=null; canvas.onmousedown=null; mgState=null; };
+  document.getElementById("mgClose").onclick=function(){ overlay.classList.remove("on"); S.paused=false; canvas.ontouchstart=null; canvas.onmousedown=null; mgState=null; };
+}
+
+(function stick(){
+  const el=document.getElementById("stick"), kn=document.getElementById("knob");
+  function set(x,y){
+    const r=el.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
+    let dx=x-cx, dy=y-cy, m=Math.hypot(dx,dy), max=r.width/2-8;
+    if(m>max){ dx=dx/m*max; dy=dy/m*max; m=max; }
+    kn.style.transform="translate("+dx+"px,"+dy+"px)";
+    S.stick.dx=dx/max; S.stick.dy=dy/max; S.stick.on=true;
+  }
+  function end(){ S.stick.dx=0; S.stick.dy=0; S.stick.on=false; kn.style.transform="translate(0,0)"; }
+  el.addEventListener("pointerdown", e=>{ el.setPointerCapture(e.pointerId); set(e.clientX,e.clientY); });
+  el.addEventListener("pointermove", e=>{ if(S.stick.on) set(e.clientX,e.clientY); });
+  el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end);
+})();
+window.addEventListener("resize", ()=>{ resize(); if(S.insideHouse) resizeHouseCanvas(); });
+window.addEventListener("beforeunload", ()=>{ if(S.sid){ navigator.sendBeacon?.(RTDB+"/rooms/"+S.sid+"/live/"+uid+".json", JSON.stringify(null)); saveAccount(); } });
+
+/* ЛАУНЧЕР */
+function drawPreview(){
+  ptx.fillStyle="#0a0d14"; ptx.fillRect(0,0,220,240);
+  ptx.fillStyle="#161c24"; ptx.fillRect(0,170,220,70);
+  drawPed(ptx,110,148,0,S.skin,"",true);
+  ptx.fillStyle="#c9a56a"; ptx.font="12px Segoe UI"; ptx.textAlign="center";
+  ptx.fillText(SKINS[S.skin].n,110,210); ptx.textAlign="left";
+  document.getElementById("skinN").textContent=SKINS[S.skin].n;
+}
+async function loadServers(){
+  try{
+    let data=await fb("servers");
+    // Миграция: перезаписываем если в Firebase старые сервера (classic/newbie/heavy)
+    if (!data || !data.crimson || !data.prime || data.classic || data.newbie || data.heavy) {
+      await fb("servers","PUT", DEFAULT_SERVERS);
+      data = DEFAULT_SERVERS;
+    }
+    S.servers = data;
+    document.getElementById("netst").textContent="состояние сети: подключено ("+S.ping+" мс)";
+    // НЕ выбираем автоматически — пользователь сам должен выбрать на экране
+    if (S.sel && !S.servers[S.sel]) S.sel = null;
+    renderCurrentServer();
+    document.getElementById("play").disabled = !S.sel;
+  }catch(e){
+    S.servers=DEFAULT_SERVERS;
+    document.getElementById("netst").textContent="состояние сети: автономный режим";
+    if (S.sel && !S.servers[S.sel]) S.sel = null;
+    renderCurrentServer();
+    document.getElementById("play").disabled = !S.sel;
+  }
+}
+document.getElementById("skinL").onclick=()=>{ S.skin=(S.skin+SKINS.length-1)%SKINS.length; drawPreview(); };
+document.getElementById("skinR").onclick=()=>{ S.skin=(S.skin+1)%SKINS.length; drawPreview(); };
+document.getElementById("play").onclick=join;
+document.getElementById("btnHelp").onclick=()=>document.getElementById("mdHelp").classList.add("on");
+document.getElementById("btnSet").onclick=()=>document.getElementById("mdSet").classList.add("on");
+document.getElementById("gfx").onchange=e=> S.gfx=+e.target.value;
+document.getElementById("vol").oninput=e=> S.vol=+e.target.value;
+document.getElementById("nick").value = S.nick || "";
+document.getElementById("nick").addEventListener("keydown", e=>{ if(e.code==="Enter"){ e.preventDefault(); join(); }});
+
+async function boot(){
+  log("Mo0nlyy Engine 4.7.3");
+  setBar(.1);
+  log("device "+(innerWidth+"x"+innerHeight)+(navigator.maxTouchPoints?" touch":""));
+  setBar(.25);
+  try{ localStorage.setItem("mr_t","1"); localStorage.removeItem("mr_t"); log("profile ok"); }catch(e){ log("profile fail"); }
+  setBar(.4);
+  log("loading map...");
+  await new Promise(resolve => {
+    loadMapImage((ok, source) => {
+      if (ok) log("map loaded from " + source + ": " + MAP_IMAGE.width + "x" + MAP_IMAGE.height);
+      else    log("map not found — procedural background");
+      resolve();
+    });
+  });
+  initMapUploadButton();
+  marketInit();
+  buildWorld();
+  log("world: "+S.places.length+" places, "+S.buildings.length+" buildings, "+S.npcs.length+" npcs");
+  setBar(.62);
+  try{
+    const t0=performance.now();
+    await loadServers();
+    log("rtdb "+Math.round(performance.now()-t0)+"ms · "+Object.keys(S.servers).length+" servers");
+  }catch(e){ log("rtdb fail"); }
+  setBar(.88);
+  drawPreview();
+  setBar(1);
+  log("ready");
+  setTimeout(()=>{
+    document.getElementById("boot").style.display="none";
+    const auth = checkAuth();
+    if (auth) {
+      document.getElementById("home").classList.add("on");
+      document.getElementById("nick").value = auth.login || "";
+    } else {
+      showAuthScreen();
+    }
+  }, 420);
+  setInterval(loadServers, 6000);
+}
+boot();
+})();
+</script>
+</body>
+</html>
